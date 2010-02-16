@@ -1,0 +1,2 @@
+#labels Phase-Implementation
+Put a list of _all_ sound effects here. Eg, not just "pistol", but "pistol shot A", "pistol shot B", "bullet-metal collision", "bullet-wood collision", "bullet ricochet", "miss", "no ammo sound", "reload sound", "chamber revolve sound", etc.
