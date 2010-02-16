@@ -1,0 +1,4 @@
+#labels Phase-Implementation
+Put _all_ art elements required here. Eg, not just "velociraptor", but "velociraptor with pirate outfit", "velociraptor with ninja outfit", etc. (don't forget things like explosion graphics, barrels, clouds, lampposts, wall panels, graffiti, and other background stuff)
+
+Please note, the scale for the art is 1 pixel = 2 inches.
