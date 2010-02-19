@@ -397,6 +397,46 @@ class RotPoly:
 	def getCenter(self):
 		return (self.centerx, self.centery)
 
+	def left(self):
+		l = None
+		ps = self.getPoints()
+		for p in ps:
+			if p[0] < l or l is None:
+				l = p[0]
+		return l
+
+	def right(self):
+		l = None
+		ps = self.getPoints()
+		for p in ps:
+			if p[0] > l or l is None:
+				l = p[0]
+		return l
+
+	def top(self):
+		l = None
+		ps = self.getPoints()
+		for p in ps:
+			if p[1] < l or l is None:
+				l = p[1]
+		return l
+
+
+	def bottom(self):
+		l = None
+		ps = self.getPoints()
+		for p in ps:
+			if p[1] > l or l is None:
+				l = p[1]
+		return l
+
+	def boundingRect(self):
+		l = self.left()
+		r = self.right()
+		t = self.top()
+		b = self.bottom()
+		return (l, t, r-l, b-t)
+
 class RotRect(RotPoly):
 
 	def __init__(self, x, y, width, height, rotation):

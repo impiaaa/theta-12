@@ -58,26 +58,50 @@ class AnimSequence:
 		self.__current_image_index = 0
 		self.loops = 0
 
+
+def _findRect(points):
+	""" Finds the rect that bounds all the given points """
+	lx, ly, gx, gy = None, None, None, None
+	for p in points:
+		x, y = p[0], p[1]
+		if lx is None or x < lx:
+			lx = x
+		if gx is None or x > gx:
+			gx = x
+		if ly is None or y < ly:
+			ly = y
+		if gy is None or y > gy:
+			gy = y
+	return (lx, ly, gx-lx, gy-ly)
+
 class Artist:
 	""" Set the color and stroke with the color (eg (0, 255, 10) ) and stroke (eg 3) attributes. """
-	def __init__(self, screen, dimensions):
+	def __init__(self, screen, dimensions, dirty_rects):
 		self.screen = screen
 		self.width = dimensions[0]
 		self.height = dimensions[1]
 		self.color = (0, 0, 0)
 		self.stroke = 1
+		self.dirty_rects = dirty_rects
+
+	def addDirtyRect(self, rect):
+		self.dirty_rects.append((rect[0]-3, rect[1]-3, rect[2]+6, rect[3]+6))
+
 
 	def drawLine(self, line):
 		""" line in the form ((x1, y1), (x2, y2), (x3, y3), (x4, y4)) """
 		pygame.draw.line(self.screen, self.color, line[0], line[1], self.stroke)
+		self.addDirtyRect(_findRect(line))
 
 	def drawRect(self, upper_left, dimensions):
 		""" draws rectangle; upper_left in (x, y), dimensions in (width, height) """
-		pygame.draw.ellipse(self.screen, self.color, (upper_left[0], upper_left[1], dimensions[0], dimensions[1]), self.stroke)
+		pygame.draw.rect(self.screen, self.color, (upper_left[0], upper_left[1], dimensions[0], dimensions[1]), self.stroke)
+		self.addDirtyRect((upper_left[0], upper_left[1], dimensions[0], dimensions[1]))
 
 	def drawOval(self, upper_left, dimensions):
 		""" Draws the oval with given upper-left corner and dimensions """
 		pygame.draw.ellipse(self.screen, self.color, (upper_left[0], upper_left[1], dimensions[0], dimensions[1]), self.stroke)
+		self.addDirtyRect((upper_left[0], upper_left[1], dimensions[0], dimensions[1]))
 
 	def drawPolyPoints(self, points):
 		lp = points[-1]
