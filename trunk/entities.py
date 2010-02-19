@@ -13,6 +13,17 @@ class Entity:
 	def update(self, time):
 		self.anim.update(time)
 
+	def left(self):
+		return self.geom.left()
+	def right(self):
+		return self.geom.right()
+	def top(self):
+		return self.geom.top()
+	def bottom(self):
+		return self.geom.bottom()
+	def boundingRect(self):
+		return self.geom.boundingRect()
+
 	def willIntersect(self, poly, time):
 		vangle = physics.getAngle(self.velx, self.vely)
 		mag = math.sqrt(self.velx**2 + self.vely**2)
@@ -29,6 +40,7 @@ class Entity:
 
 
 	def getMotionSmear(self, time):
+		""" The motion smear is the polygon that would be created if this entity's motion path were smeared out over time. """
 		pA, pB = None, None # see above ascii art for what points a and b are
 
 		vangle = physics.getAngle(self.velx, self.vely)
@@ -42,13 +54,13 @@ class Entity:
 		# top-right point
 		for i in range(len(me1)):
 			p = me1[i]
-			if pA == None or (p[0] > me1[pA][0] and p[1] > me1[pA][1]):
+			if pA is None or p[1] > me1[pA][1] or (p[1] == me1[pA][1] and p[0] > me1[pA][0]):
 				pA = i
 
 		# bottom-right point
 		for i in range(len(me1)):
 			p = me1[i]
-			if pB == None or (p[0] > me1[pB][0] and p[1] < me1[pB][1]):
+			if pB is None or p[1] < me1[pB][1] or (p[1] == me1[pB][1] and p[0] > me1[pB][0]):
 				pB = i
 
 		smear = []
@@ -62,7 +74,10 @@ class Entity:
 		poly = me1
 	 	i = start
 
-		print "me1 len: " + str(len(me1)) + ", a: " + str(pA) + ", b: " + str(pB) + ", i: " + str(i)
+		# debugging stuff
+		#print "me1 len: " + str(len(me1)) + ", a: " + str(pA) + ", b: " + str(pB) + ", i: " + str(i)
+		#print "dir=" + str(direction)
+		
 		# constructing the smear poly
 		while True:
 			# made into a new tuple just in case they're mutable for some reason

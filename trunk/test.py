@@ -2,6 +2,21 @@ import os, pygame
 import math, physics, entities, graphwrap
 from pygame.locals import *
 
+def empty(stuff):
+	""" Removes every item from list 'stuff' """
+	for i in range(len(stuff)):
+		stuff.pop()
+
+def copy(list1, list2):
+	for i in range(len(list1)):
+		list2.append(list1[i])
+
+def move(list1, list2, clearFirst=False):
+	if clearFirst:
+		empty(list2)
+	for i in range(len(list1)):
+		list2.append(list1.pop())
+
 def main():
 	pygame.init()
 	screen = pygame.display.set_mode((640, 480))
@@ -32,9 +47,14 @@ def main():
 
 	steve = entities.Entity(tri2, None)
 
-	jim = graphwrap.Artist(screen, screen.get_size())
+	drects = []
+	last_drects = []
 
-	
+	jim = graphwrap.Artist(screen, screen.get_size(), drects)
+
+	testp = physics.RotPoly((200, 200), ((-20, 3), (50, 3), (100, -320), (40, 10), (37, 29)), 0)
+
+	greg = entities.Entity(testp, None)
 
 	while 1:
 		clock.tick(60)
@@ -51,6 +71,10 @@ def main():
 
 		a2 = physics.rotatedPointRelative(origin, p, p, (p[0], p[1]+10), math.radians(-135))
 		pygame.draw.line(screen, (0, 0, 250), p, a2, 2)
+
+		pr = graphwrap._findRect((origin, p, a1, a2))
+
+		drects.append(pr)
 
 		#triangle drawing
 		trilines = tri.getLines()
@@ -73,11 +97,17 @@ def main():
 			#pygame.draw.line(screen, (0, 0, 0), rl[0], (rect.centerx, rect.centery), thick)
 			rc += 1
 			if (rc >= len(colors)): rc = 0
+		drects.append(graphwrap._findRect(rect.getPoints()))
 
-		jim.color = (0, 0, 0)
+		jim.color = (0, 0, 255)
 		steve.draw(jim)
 		jim.color = (255, 0, 0)
 		jim.drawPolyPoints(steve.getMotionSmear(1))
+		if steve.right() > 640 or steve.bottom() > 480 or steve.top() < 0 or steve.left() < 0:
+			steve.geom.angle += math.radians(1)
+
+		steverect = graphwrap._findRect(steve.geom.getPoints())
+		jim.drawRect((steverect[0], steverect[1]), (steverect[2], steverect[3]))
 
 		# recalculate origin
 		vel = physics.rotatedPointAbsolute((0, 0), (0, 2), angle)
@@ -88,6 +118,8 @@ def main():
 		# spin everything
 		angle += math.radians(1)
 
+		testp.angle = angle
+
 		vel = physics.rotatedPointAbsolute((0, 0), (0, 0.5), tri.angle)
 		tri.centerx += vel[0]
 		tri.centery += vel[1]
@@ -96,6 +128,9 @@ def main():
 		tri2.centerx += vel[0]
 		tri2.centery += vel[1]
 
-		pygame.display.flip()
+		pygame.display.update(last_drects)
+		pygame.display.update(drects)
+
+		move(drects, last_drects, True)
 
 if __name__ == "__main__": main()

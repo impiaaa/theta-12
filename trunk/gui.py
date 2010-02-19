@@ -2,30 +2,21 @@ import os, pygame, graphwrap
 import math, physics
 from pygame.locals import *
 
-def main():
-	pygame.init()
-	screen = pygame.display.set_mode((640, 480))
-	pygame.display.set_caption("CODE Game Testing")
-
-	background = pygame.Surface(screen.get_size())
-	background = background.convert()
-	background.fill((250, 250, 250))
-
-	screen.blit(background, (0, 0))
-	pygame.display.flip()
-
-	clock = pygame.time.Clock()
-
-	artist = graphwrap.Artist(screen)
-
-	while 1:
-		clock.tick(60)
-		# calculate time passed here ...
-
-		screen.blit(background, (0, 0))
-
-		# iterate through all entities and update (then draw) them ...
-
+class gui(Object):
+	def __init__(self):
+		pygame.init()
+		self.dirty_rects = []
+		self.screen = pygame.display.set_mode((640, 480))
+		pygame.display.set_caption("CODE Game Testing")
+	
+		self.background = pygame.Surface(self.screen.get_size())
+		self.background = background.convert()
+		self.background.fill((250, 250, 250))
+	
+		self.screen.blit(background, (0, 0))
 		pygame.display.flip()
+	
+		self.artist = graphwrap.Artist(screen)
 
-if __name__ == "__main__": main()
+	def update(self):
+		pygame.display.update(self.dirty_rects)
