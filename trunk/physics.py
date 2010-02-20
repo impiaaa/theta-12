@@ -57,13 +57,9 @@ def rotatedPointAbsolute(origin, point, angle):
 	 it was at the given angle to the origin. In other words,	
 	 it tells you where the point would be if the angle
 	 was as given and the distance to the origin was the same.  """
-	ox = origin[0]
-	oy = origin[1]
-	px = point[0]
-	py = point[1]
+	ox, oy, px, py = origin[0], origin[1], point[0], point[1]
 
-	distx = px - ox
-	disty = py - oy
+	distx, disty = px - ox, py - oy
 
 	distance = math.sqrt(distx**2 + disty**2)
 
@@ -340,12 +336,15 @@ def pointOfIntersection(line1, line2, threshold=1.5):
 	return (px, (py1+py2)/2)
 
 
-def rotatedPoints(center, points, angle):
+def rotatedPoints(center, points, angle, absolute=False):
 	""" returns a new list of points rotated around the given center by angle """
 	ps = points
 	nps = []
 	for p in ps:
-		nps.append(rotatedPointRelative(center, p, center, p, angle))
+		if absolute:
+			nps.append(rotatedPointAbsolute(center, p, angle))
+		else:
+			nps.append(rotatedPointRelative(center, p, center, p, angle))
 	return nps
 
 

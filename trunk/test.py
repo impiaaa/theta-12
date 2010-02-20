@@ -17,6 +17,9 @@ def move(list1, list2, clearFirst=False):
 	for i in range(len(list1)):
 		list2.append(list1.pop())
 
+def inrange(num, start, stop):
+		return num >= start and num <= stop
+
 def main():
 	pygame.init()
 	screen = pygame.display.set_mode((640, 480))
@@ -43,7 +46,7 @@ def main():
 
 	tri = physics.RotPoly((screen.get_size()[0]/2, 50), ((0, -30), (-50, 50), (50, 50)), 0)
 
-	tri2 = physics.RotPoly((screen.get_size()[0]/2, 280), ((-50, -50), (50, 0), (-50, 50)), 0)
+	tri2 = physics.RotPoly((screen.get_size()[0]/2, 280), ((-50, -50), (50, -5), (60, -10), (70, 0), (60, 10), (50, 5), (-50, 50)), 0)
 
 	steve = entities.Entity(tri2, None)
 
@@ -55,6 +58,8 @@ def main():
 	testp = physics.RotPoly((200, 200), ((-20, 3), (50, 3), (100, -320), (40, 10), (37, 29)), 0)
 
 	greg = entities.Entity(testp, None)
+
+	turnleft, turnright, forward = False, False, True
 
 	while 1:
 		clock.tick(60)
@@ -103,12 +108,28 @@ def main():
 		steve.draw(jim)
 		jim.color = (255, 0, 0)
 		jim.drawPolyPoints(steve.getMotionSmear(1))
-		if steve.right() > 640 or steve.bottom() > 480 or steve.top() < 0 or steve.left() < 0:
-			steve.geom.angle += math.radians(1)
+
+		ainc = math.radians(1)
+		events = pygame.event.get(pygame.KEYDOWN)
+		for e in events:
+			if e.key == pygame.K_LEFT: turnleft = True
+			elif e.key == pygame.K_RIGHT: turnright = True
+		events = pygame.event.get(pygame.KEYUP)
+		for e in events:
+			if e.key == pygame.K_LEFT: turnleft = False
+			elif e.key == pygame.K_RIGHT: turnright = False
+			elif e.key == pygame.K_SPACE: forward = not forward
+
+		if turnleft:
+			steve.geom.angle -= ainc
+		if turnright:
+			steve.geom.angle += ainc
 
 		steverect = graphwrap._findRect(steve.geom.getPoints())
-		jim.drawRect((steverect[0], steverect[1]), (steverect[2], steverect[3]))
+		#jim.drawRect((steverect[0], steverect[1]), (steverect[2], steverect[3]))
 
+
+		"""
 		# recalculate origin
 		vel = physics.rotatedPointAbsolute((0, 0), (0, 2), angle)
 		origin[0] += vel[0]
@@ -127,10 +148,19 @@ def main():
 		vel = physics.rotatedPointAbsolute((0, 0), (0, 0.5), tri2.angle)
 		tri2.centerx += vel[0]
 		tri2.centery += vel[1]
+		"""
+
+		if forward:
+			steve.velx, steve.vely = physics.rotatedPointAbsolute((0, 0), (50, 0), steve.geom.angle)
+		else:
+			steve.velx, steve.vely = 0, 0
+		steve.update(clock.get_time()/1000.)
 
 		pygame.display.update(last_drects)
 		pygame.display.update(drects)
 
 		move(drects, last_drects, True)
+
+		pygame.display.flip() # just for now
 
 if __name__ == "__main__": main()
