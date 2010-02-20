@@ -90,6 +90,8 @@ class Artist:
 
 	def drawLine(self, line):
 		""" line in the form ((x1, y1), (x2, y2), (x3, y3), (x4, y4)) """
+
+		#print "stuff: " + str(line[0]) + ", " + str(line[1])
 		pygame.draw.line(self.screen, self.color, line[0], line[1], self.stroke)
 		self.addDirtyRect(_findRect(line))
 
@@ -107,6 +109,7 @@ class Artist:
 		lp = points[-1]
 		for p in points:
 			self.drawLine((lp, p))
+			lp = p
 
 	def drawLines(self, lines):
 		""" Draws the list of lines """

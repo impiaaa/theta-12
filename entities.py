@@ -7,11 +7,14 @@ class Entity:
 		self.velx, self.vely = 0, 0
 		
 	def draw(self, artist):
-		if self.anim == None:
-			artist.drawLines(self.geom.getLines())
+		if self.anim is None:
+			artist.drawLines(self.geom.getLines()) # this is throwing an exception in graphwrap.Artist for some reason
 
 	def update(self, time):
-		self.anim.update(time)
+		if self.anim is not None:
+			self.anim.update(time)
+		self.geom.centerx += self.velx * time
+		self.geom.centery += self.vely * time
 
 	def left(self):
 		return self.geom.left()
@@ -33,9 +36,9 @@ class Entity:
 #  /  \_/ \/ \				/  \_/ \/ \				|
 #  |          \				|          \	(-1, 1) | (1, 1)	
 #  \       ___/	   SMEAR	\       ___/	<-------+------->	
-#   |     |  				|     |		   (-1, -1) | (1, -1)
-#   \     \__				\     \__				|
-#    \_______\B..............\_______\				V
+#   |     |  				 |     |	   (-1, -1) | (1, -1)
+#   \     \__				 \     \__				|
+#    \_______\B.............. \_______\				V
 # 
 
 
@@ -45,7 +48,10 @@ class Entity:
 
 		vangle = physics.getAngle(self.velx, self.vely)
 		mag = math.sqrt(self.velx**2 + self.vely**2)
-		me1 = physics.rotatedPoints(self.geom.getCenter(), self.geom.getPoints(), -vangle) # -vangle rotates to horizontal -->
+		me1 = physics.rotatedPoints(self.geom.getCenter(),
+				self.geom.getPoints(), -vangle, False) # -vangle rotates to horizontal -->
+
+
 		me2 = []
 		for m in me1:
 			me2.append((m[0]+mag*time, m[1]))
@@ -54,13 +60,13 @@ class Entity:
 		# top-right point
 		for i in range(len(me1)):
 			p = me1[i]
-			if pA is None or p[1] > me1[pA][1] or (p[1] == me1[pA][1] and p[0] > me1[pA][0]):
+			if pA is None or p[1] < me1[pA][1] or (p[1] == me1[pA][1] and p[0] > me1[pA][0]):
 				pA = i
 
 		# bottom-right point
 		for i in range(len(me1)):
 			p = me1[i]
-			if pB is None or p[1] < me1[pB][1] or (p[1] == me1[pB][1] and p[0] > me1[pB][0]):
+			if pB is None or p[1] > me1[pB][1] or (p[1] == me1[pB][1] and p[0] > me1[pB][0]):
 				pB = i
 
 		smear = []
@@ -89,6 +95,11 @@ class Entity:
 				break
 			else:
 				i += direction
+
+			if i >= len(me1):
+				i = 0
+			elif i < 0:
+				i = len(me1)-1
 
 		return physics.rotatedPoints(self.geom.getCenter(), smear, vangle)
 		
