@@ -161,6 +161,5 @@ def main():
 
 		move(drects, last_drects, True)
 
-		pygame.display.flip() # just for now
 
 if __name__ == "__main__": main()

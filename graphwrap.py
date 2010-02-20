@@ -93,17 +93,14 @@ class Artist:
 
 		#print "stuff: " + str(line[0]) + ", " + str(line[1])
 		pygame.draw.line(self.screen, self.color, line[0], line[1], self.stroke)
-		self.addDirtyRect(_findRect(line))
 
 	def drawRect(self, upper_left, dimensions):
 		""" draws rectangle; upper_left in (x, y), dimensions in (width, height) """
 		pygame.draw.rect(self.screen, self.color, (upper_left[0], upper_left[1], dimensions[0], dimensions[1]), self.stroke)
-		self.addDirtyRect((upper_left[0], upper_left[1], dimensions[0], dimensions[1]))
 
 	def drawOval(self, upper_left, dimensions):
 		""" Draws the oval with given upper-left corner and dimensions """
 		pygame.draw.ellipse(self.screen, self.color, (upper_left[0], upper_left[1], dimensions[0], dimensions[1]), self.stroke)
-		self.addDirtyRect((upper_left[0], upper_left[1], dimensions[0], dimensions[1]))
 
 	def drawPolyPoints(self, points):
 		lp = points[-1]

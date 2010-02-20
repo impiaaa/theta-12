@@ -5,14 +5,20 @@ class Entity:
 		self.geom = poly # RotPoly
 		self.anim = anim # AnimSprite
 		self.velx, self.vely = 0, 0
+		self.move_allowed = True # flag set to false if collision is imminent
 		
 	def draw(self, artist):
 		if self.anim is None:
 			artist.drawLines(self.geom.getLines()) # this is throwing an exception in graphwrap.Artist for some reason
 
-	def update(self, time):
+		br = self.boundingRect()
+		artist.addDirtyRect(br)
+
+	def updateArt(self, time):
 		if self.anim is not None:
 			self.anim.update(time)
+
+	def update(self, time):
 		self.geom.centerx += self.velx * time
 		self.geom.centery += self.vely * time
 
@@ -26,6 +32,11 @@ class Entity:
 		return self.geom.bottom()
 	def boundingRect(self):
 		return self.geom.boundingRect()
+
+	def smearsIntersect(self, other_entity, time):
+		smear1 = physics.RotPoly((0, 0), self.getMotionSmear(time), 0)
+		smear2 = physics.RotPoly((0, 0), other_entity.getMotionSmear(time), 0)
+		return smear1.intersects(smear2)
 
 	def willIntersect(self, poly, time):
 		vangle = physics.getAngle(self.velx, self.vely)
