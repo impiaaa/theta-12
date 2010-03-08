@@ -3,7 +3,7 @@ import math, physics, entities, graphwrap
 from pygame.locals import *
 
 def empty(stuff):
-	""" Removes every item from list 'stuff' """
+	""" Removes every item from list "stuff" """
 	for i in range(len(stuff)):
 		stuff.pop()
 
