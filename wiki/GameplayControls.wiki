@@ -1,0 +1,18 @@
+# list of controls for actually playing the game
+
+= Introduction =
+
+List all the controls for the gameplay here. This includes both player interaction (jump, attack, etc) and menu/interface design. I'll start it with a list of actions that need controls.
+
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Go left - 
+  * Go right - 
+  * Jump - 
+  * attack - 
+  * switch weapon - 
+  * activate something - 
+  * pick something up - 
+  * play/pause - 
