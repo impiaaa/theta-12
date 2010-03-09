@@ -1,5 +1,6 @@
-# ... means you need to code something
-
+###############################################################################
+## All of the important coding done here was done by Gabriel Ortega-Gingrich ##
+###############################################################################
 
 def playSound(sound_id,loop,maxtim):
 	""" Plays the sound with the given string id """
@@ -15,9 +16,6 @@ def stopSound(sound_id):
 
 def playTrack(track_id,loop):
 	""" Plays the music track with the given string id """
-	# ... The implementation of this should be
-	#     different than playSound() because it is bad to load
-	#	  a whole track into memory, so it must be streamed.
     pygame.mixer.music.load(track_id)
     pygame.mixer.music.play(loops=loop)
 
