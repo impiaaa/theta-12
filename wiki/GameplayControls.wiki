@@ -10,7 +10,7 @@ List all the controls for the gameplay here. This includes both player interacti
 = Details =
 
 Add your content here.  Format your content with:
-  * Go left - 
+  * Go left -
   * Go right - 
   * Jump - 
   * attack - 
@@ -18,3 +18,15 @@ Add your content here.  Format your content with:
   * activate something - 
   * pick something up - 
   * play/pause - 
+
+Gabriels Suggested Controls
+
+Go left - left arrow
+Go right - right arrow
+Jump - Z
+Attack - X
+Switch weapon (up) - S
+Switch weapon (down) - A
+Activate - up arrow
+Pick something up - down arrow
+play/pause - Q
