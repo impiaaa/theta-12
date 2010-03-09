@@ -1,4 +1,6 @@
+#labels Phase-Design
 # list of controls for actually playing the game
+# we should probably have the controls be user-defined, so let's put defaults here.
 
 = Introduction =
 
