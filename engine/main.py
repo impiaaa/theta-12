@@ -1,7 +1,7 @@
 import sys, os, random, math
 import pygame
 from pygame.locals import *
-import physics, entities, graphwrap
+import physics, entities, graphwrap, level
 
 # helper functions
 def empty(stuff):
@@ -29,7 +29,8 @@ def randomEntity():
 	print str(e.geom.getPoints())
 	return e
 
-things = []
+current_level = level.tlevel
+player = entities.Entity(physics.RotRect(420, 100, 30, 20, 0), None)
 
 def main():
 	pygame.init()
@@ -52,28 +53,30 @@ def main():
 
 		screen.blit(background, (0, 0))
 
+		croom = current_level.croom
+
 		# process events
 		# ...
 
-		for e in pygame.event.get(pygame.KEYDOWN):
-			if e.key == pygame.K_SPACE:
-				things.append(randomEntity())
+		player.vely = 200
+
 
 		# detect collisions
-		for a in things:
-			for b in things:
-				if a is b: continue
-				if a.smearsIntersect(b, 0.016):
-					a.move_allowed = False
-					b.move_allowed = False
+		for a in croom.geometry:
+			if a.smearsIntersect(player, 0.016):
+				player.vely = -50
 
-		for e in things:
-			if not e.move_allowed:
-				e.geom.angle += math.radians(1)
+		for e in croom.all:
 			e.update(0.016)
 			e.updateArt(0.016)
 			e.draw(artist)
 			e.move_allowed = True # reset flag for next iteration
+			artist.drawPolyPoints(e.getMotionSmear(0.016))
+		player.update(0.016)
+		player.updateArt(0.016)
+		player.draw(artist)
+
+		artist.drawPolyPoints(player.getMotionSmear(0.016))
 				
 
 		# draw everything

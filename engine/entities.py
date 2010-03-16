@@ -114,4 +114,8 @@ class Entity:
 
 		return physics.rotatedPoints(self.geom.getCenter(), smear, vangle)
 		
+
+class BlockEntity(Entity):
+	def __init__(self, x, y, w, h, anim):
+		Entity.__init__(self, physics.RotRect(x, y, w, h, 0), anim)
 		
