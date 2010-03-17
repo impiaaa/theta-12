@@ -32,6 +32,6 @@ class Level:
 
 tlevel = Level()
 troom = tlevel.croom
-tblock = entities.BlockEntity(400, 400, 70, 50, None)
+tblock = entities.Entity((400, 400, 70, 50), None)
 troom.all.append(tblock)
 troom.geometry.append(tblock)
