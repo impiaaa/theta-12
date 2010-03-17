@@ -30,7 +30,8 @@ def randomEntity():
 	return e
 
 current_level = level.tlevel
-player = entities.Entity((420, 100, 30, 20), None)
+player = entities.Entity((420.0, 100.0, 30.0, 20.0), None)
+
 
 def main():
 	pygame.init()
@@ -56,27 +57,44 @@ def main():
 		croom = current_level.croom
 
 		# process events
-		# ...
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				return
+			if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_LEFT:
+					player.velx = -50
+				elif event.key == pygame.K_RIGHT:
+					player.velx = 50.0
+				elif event.key == pygame.K_UP and player.acy == 0:
+					player.vely = -300
 
-		player.vely = 200 # debug
+
+
 
 
 		# update movement
 		for e in croom.all:
 			e.update(0.016)
+
 		player.update(0.016)
 
 
+
+		player.acy = 192 # 9.8 m/s, according to the art team's scale
 				
 		# detect collisions
 		for a in croom.geometry:
 			if a is player: continue
-			a.vely = -1
+			a.vely = -100
 
 			if a.intersects(player):
-				player.vely = 0
+				if player.vely > 0:
+					player.vely = 0
+				player.acy = 0 # stop accelerating downwards...
 				if player.geom.bottom > a.geom.top:
 					player.geom.bottom = a.geom.top
+
+
 
 		# draw everything
 		for e in croom.all:
