@@ -30,7 +30,7 @@ def randomEntity():
 	return e
 
 current_level = level.tlevel
-player = entities.Entity(physics.RotRect(420, 100, 30, 20, 0), None)
+player = entities.Entity((420, 100, 30, 20), None)
 
 def main():
 	pygame.init()
@@ -58,28 +58,32 @@ def main():
 		# process events
 		# ...
 
-		player.vely = 200
+		player.vely = 200 # debug
 
 
-		# detect collisions
-		for a in croom.geometry:
-			if a.smearsIntersect(player, 0.016):
-				player.vely = -50
-
+		# update movement
 		for e in croom.all:
 			e.update(0.016)
-			e.updateArt(0.016)
-			e.draw(artist)
-			e.move_allowed = True # reset flag for next iteration
-			artist.drawPolyPoints(e.getMotionSmear(0.016))
 		player.update(0.016)
-		player.updateArt(0.016)
-		player.draw(artist)
 
-		artist.drawPolyPoints(player.getMotionSmear(0.016))
+
 				
+		# detect collisions
+		for a in croom.geometry:
+			if a is player: continue
+			a.vely = -1
+
+			if a.intersects(player):
+				player.vely = 0
+				if player.geom.bottom > a.geom.top:
+					player.geom.bottom = a.geom.top
 
 		# draw everything
+		for e in croom.all:
+			e.updateArt(0.016)
+			e.draw(artist)
+		player.updateArt(0.016)
+		player.draw(artist)
 
 		pygame.display.update(last_drects)
 		pygame.display.update(drects)
