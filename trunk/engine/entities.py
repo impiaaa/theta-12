@@ -4,12 +4,13 @@ import graphwrap, math
 class Entity:
 	def __init__(self, geom, anim):
 		self.geom = geom # pygame.rect.Rect or tuple
-		if geom.__class__ != pygame.rect.Rect:
+		if not isinstance(geom, pygame.rect.Rect):
 			self.geom = pygame.rect.Rect(geom) # convert to pygame.rect.Rect
 		self.anim = anim # AnimSprite
 		self.velx, self.vely = 0, 0
 		self.move_allowed = True # flag set to false if collision is imminent
 		self.acx, self.acy = 0, 0 # constant acceleration (use acy for gravity)
+		self.grounded = False # used by things that can fall
 
 		self._incx, self._incy = 0, 0 # necessary because pygame.rect.Rect uses integers =/
 		
@@ -25,6 +26,7 @@ class Entity:
 
 	def update(self, time):
 		self.velx += self.acx * time
+
 		self.vely += self.acy * time
 		self._incx += self.velx * time
 		self._incy += self.vely * time
@@ -38,8 +40,25 @@ class Entity:
 			self.geom.centery += val
 			self._incy -= val
 
+		self.grounded = False # reset grounded
+
 	def intersects(self, other_entity):
 		return self.geom.colliderect(other_entity.geom)
 
+	def collision(self, other):
+		""" This method is called when this entity hits another entity.
+			Subclasses are expected to override it to make it do something useful. """
+		return None
 
+class FloorBlock(Entity):
+	def __init__(self, geom, anim):
+		Entity.__init__(self, geom, anim)
 
+	def collision(self, other):
+		if other.vely >= 0:
+			other.vely = 0
+			if other.acy > 0:
+				other.acy = 0 # stop accelerating downwards...
+		if other.geom.bottom > self.geom.top:
+			other.geom.bottom = self.geom.top
+		other.grounded = True
