@@ -1,10 +1,6 @@
 import pygame
 import graphwrap, math
 
-
-def _sign(val):
-	return round(abs(val)/val)
-
 class Entity:
 	def __init__(self, geom, anim):
 		self.geom = geom # pygame.rect.Rect or tuple
@@ -32,12 +28,13 @@ class Entity:
 		self.vely += self.acy * time
 		self._incx += self.velx * time
 		self._incy += self.vely * time
+
 		if abs(self._incx) > 0:
-			val = _sign(self._incx)
+			val = int(self._incx)
 			self.geom.centerx += val
 			self._incx -= val
 		if abs(self._incy) > 0:
-			val = _sign(self._incy)
+			val = int(self._incy)
 			self.geom.centery += val
 			self._incy -= val
 
