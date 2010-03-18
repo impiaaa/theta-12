@@ -50,8 +50,6 @@ def main():
 
 	clock = pygame.time.Clock()
 
-	grounded = False
-	
 	while 1:
 
 		screen.blit(background, (0, 0))
@@ -68,7 +66,7 @@ def main():
 				elif event.key == pygame.K_RIGHT:
 					player.velx = 50.0
 				elif event.key == pygame.K_UP:
-					if grounded:
+					if player.grounded:
 						player.vely = -300
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
@@ -82,10 +80,6 @@ def main():
 
 		player.update(0.016)
 
-
-
-		player.acy = 192 # 9.8 m/s, according to the art team's scale
-		grounded = False
 				
 		# detect collisions
 		for a in croom.geometry:
@@ -99,17 +93,15 @@ def main():
 				a.vely = -100
 
 			if a.intersects(player):
-				if player.vely >= 0:
-					player.vely = 0
-					player.acy = 0 # stop accelerating downwards...
-				if player.geom.bottom > a.geom.top:
-					player.geom.bottom = a.geom.top
-				grounded = True
+				a.collision(player)
 
 			if abs(player.geom.bottom - a.geom.top) <= 3:
-				grounded = True
+				player.grounded = True
 
-
+		if not player.grounded:
+			player.acy = 192 # 9.8 m/s, according to the art team's scale
+		else:
+			player.acy = 0
 
 		# draw everything
 		for e in croom.all:
