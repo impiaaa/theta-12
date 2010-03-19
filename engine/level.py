@@ -36,3 +36,7 @@ for i in range(0, 20):
 	tblock = entities.FloorBlock((50*i, 400, 50, 20), None)
 	troom.all.append(tblock)
 	troom.geometry.append(tblock)
+
+fblock = entities.Block((300, 100, 50, 200), None)
+troom.all.append(fblock)
+troom.geometry.append(fblock)

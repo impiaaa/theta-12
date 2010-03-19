@@ -85,18 +85,19 @@ def main():
 		for a in croom.geometry:
 			if a is player: continue
 
-			if a.vely < 0 and a.geom.top < 100:
-				a.vely = 100
-			elif a.vely > 0 and a.geom.top > 380:
-				a.vely = -100
-			elif a.vely == 0:
-				a.vely = -100
+			if not isinstance(a, entities.Block) and False:
+				if a.vely < 0 and a.geom.top < 100:
+					a.vely = 100
+				elif a.vely > 0 and a.geom.top > 380:
+					a.vely = -100
+				elif a.vely == 0:
+					a.vely = -100
 
 			if a.intersects(player):
 				a.collision(player)
 
-			if abs(player.geom.bottom - a.geom.top) <= 3:
-				player.grounded = True
+			#if a.geom.top - player.geom.bottom <= 3:
+			#	player.grounded = True
 
 		if not player.grounded:
 			player.acy = 192 # 9.8 m/s, according to the art team's scale
