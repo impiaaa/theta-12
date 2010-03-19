@@ -54,6 +54,14 @@ class FloorBlock(Entity):
 	def __init__(self, geom, anim):
 		Entity.__init__(self, geom, anim)
 
+	def intersects(self, other_entity):
+		if Entity.intersects(self, other_entity):
+			return True
+		if self.geom.top - other_entity.geom.bottom <= 3 and (other_entity.geom.right > self.geom.right > other_entity.geom.left
+				or other_entity.geom.right > self.geom.left > other_entity.geom.left) and other_entity.geom.top < self.geom.bottom:
+			return True
+		return False
+
 	def collision(self, other):
 		if other.vely >= 0:
 			other.vely = 0
@@ -62,3 +70,33 @@ class FloorBlock(Entity):
 		if other.geom.bottom > self.geom.top:
 			other.geom.bottom = self.geom.top
 		other.grounded = True
+
+class Block(FloorBlock):
+	def __init(self, geom, anim):
+		FloorBlock.__init__(self, geom, anim)
+
+	def collision(self, other):
+		above = other.geom.bottom <= self.geom.top + 3
+		left = other.geom.right <= self.geom.left + 3
+		right = other.geom.left >= self.geom.right - 3
+		below = other.geom.top >= self.geom.centery and other.vely < 0 and other.geom.bottom > self.geom.bottom and (
+				other.geom.right > self.geom.left or other.geom.left < self.geom.right)
+
+
+		if above:
+			other.geom.bottom = self.geom.top
+			other.grounded = True
+			if other.vely >= 0:
+				other.vely = 0
+				other.acy = 0
+		elif left:
+			other.geom.right = self.geom.left
+			if other.velx > 0: other.velx = 0
+		elif right:
+			other.geom.left = self.geom.right
+			if other.velx < 0: other.velx = 0
+		if below:
+			other.geom.top = self.geom.bottom
+			if other.vely < 0:
+				other.vely = 0
+
