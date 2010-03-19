@@ -6,6 +6,7 @@ class Entity:
 		self.geom = geom # pygame.rect.Rect or tuple
 		if not isinstance(geom, pygame.rect.Rect):
 			self.geom = pygame.rect.Rect(geom) # convert to pygame.rect.Rect
+		self.last = pygame.rect.Rect((self.geom.left, self.geom.top, self.geom.width, self.geom.height))
 		self.anim = anim # AnimSprite
 		self.velx, self.vely = 0, 0
 		self.move_allowed = True # flag set to false if collision is imminent
@@ -25,11 +26,14 @@ class Entity:
 			self.anim.update(time)
 
 	def update(self, time):
-		self.velx += self.acx * time
+		self.last.left = self.geom.left
+		self.last.top = self.geom.top
 
+		self.velx += self.acx * time
 		self.vely += self.acy * time
 		self._incx += self.velx * time
 		self._incy += self.vely * time
+		
 
 		if abs(self._incx) > 0:
 			val = int(self._incx)
@@ -57,8 +61,8 @@ class FloorBlock(Entity):
 	def intersects(self, other_entity):
 		if Entity.intersects(self, other_entity):
 			return True
-		if self.geom.top - other_entity.geom.bottom <= 3 and (other_entity.geom.right > self.geom.right > other_entity.geom.left
-				or other_entity.geom.right > self.geom.left > other_entity.geom.left) and other_entity.geom.top < self.geom.bottom:
+		if self.geom.top - other_entity.geom.bottom <= 3 and (self.geom.right > other_entity.geom.right > self.geom.left
+				or self.geom.right > other_entity.geom.left > self.geom.left):
 			return True
 		return False
 
@@ -67,7 +71,6 @@ class FloorBlock(Entity):
 			other.vely = 0
 			if other.acy > 0:
 				other.acy = 0 # stop accelerating downwards...
-		if other.geom.bottom > self.geom.top:
 			other.geom.bottom = self.geom.top
 		other.grounded = True
 
@@ -75,28 +78,41 @@ class Block(FloorBlock):
 	def __init(self, geom, anim):
 		FloorBlock.__init__(self, geom, anim)
 
+
+	def intersects(self, other_entity):
+		if Entity.intersects(self, other_entity):
+			return True
+		if self.geom.top - other_entity.geom.bottom <= 3 and (self.geom.right > other_entity.geom.right > self.geom.left
+				or self.geom.right > other_entity.geom.left > self.geom.left) and other_entity.geom.top < self.geom.bottom:
+			return True
+		return False
+
 	def collision(self, other):
-		above = other.geom.bottom <= self.geom.top + 3
-		left = other.geom.right <= self.geom.left + 3
-		right = other.geom.left >= self.geom.right - 3
-		below = other.geom.top >= self.geom.centery and other.vely < 0 and other.geom.bottom > self.geom.bottom and (
-				other.geom.right > self.geom.left or other.geom.left < self.geom.right)
-
-
-		if above:
+		if other.geom.bottom < self.geom.top:
 			other.geom.bottom = self.geom.top
 			other.grounded = True
-			if other.vely >= 0:
-				other.vely = 0
-				other.acy = 0
-		elif left:
-			other.geom.right = self.geom.left
-			if other.velx > 0: other.velx = 0
-		elif right:
-			other.geom.left = self.geom.right
-			if other.velx < 0: other.velx = 0
-		if below:
-			other.geom.top = self.geom.bottom
-			if other.vely < 0:
-				other.vely = 0
+			return
 
+		above = other.geom.bottom <= self.geom.top
+		below = other.geom.top >= self.geom.bottom
+		left = other.geom.right <= self.geom.left
+		right = other.geom.left >= self.geom.right
+
+		wabove = other.last.bottom <= self.geom.top
+		wbelow = other.last.top >= self.geom.bottom
+		wleft = other.last.right <= self.geom.left
+		wright = other.last.left >= self.geom.right
+
+		if wabove:
+			other.geom.bottom = self.geom.top
+			other.grounded = True
+			other.vely, other.acy = 0, 0
+		elif wleft and not left:
+			other.geom.right = self.geom.left
+			other.velx = 0
+		elif wright and not right:
+			other.geom.left = self.geom.right
+			other.velx = 0
+		elif wbelow and not below:
+			other.geom.top = self.geom.bottom
+			other.vely = 0
