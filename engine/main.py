@@ -68,6 +68,9 @@ def main():
 				elif event.key == pygame.K_UP:
 					if player.grounded:
 						player.vely = -300
+						print "Hop!"
+					else:
+						print "Not on ground."
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
 					player.velx = 0
