@@ -34,7 +34,6 @@ tlevel = Level()
 troom = tlevel.croom
 for i in range(0, 20):
 	tblock = entities.Block((50*i, 400, 50, 20), None)
-	tblock.sticky = True
 	troom.all.append(tblock)
 	troom.geometry.append(tblock)
 
