@@ -69,7 +69,7 @@ class FloorBlock(Entity):
 
 	def collision(self, other):
 		if other.vely >= 0:
-			other.vely = 0
+			other.vely = self.vely
 			if other.acy > 0:
 				other.acy = 0 # stop accelerating downwards...
 			other.geom.bottom = self.geom.top
@@ -78,21 +78,9 @@ class FloorBlock(Entity):
 class Block(FloorBlock):
 	def __init__(self, geom, anim):
 		FloorBlock.__init__(self, geom, anim)
-		self.sticky = False # if set to true, things sitting on this
-							# will descend at the same rate as this
-		self.sitters = [] # list of the things sitting on me
 
 	def update(self, time):
 		Entity.update(self, time)
-
-		if self.sticky:
-			for sitter in self.sitters:
-				if (sitter.vely < 0 or sitter.geom.right < self.geom.left
-					or sitter.geom.left > self.geom.right or (sitter.geom.bottom < self.geom.top and sitter.grounded)):
-					self.sitters.remove(sitter)
-					sitter.sticking = False
-				elif sitter.geom.bottom < self.geom.top and not sitter.grounded:
-					sitter.geom.bottom = self.geom.top
 
 	def intersects(self, other_entity):
 		if Entity.intersects(self, other_entity):
@@ -106,6 +94,7 @@ class Block(FloorBlock):
 		if other.geom.bottom < self.geom.top:
 			other.geom.bottom = self.geom.top
 			other.grounded = True
+			other.vely = self.vely
 			return
 
 		above = other.geom.bottom < self.geom.top
@@ -121,24 +110,18 @@ class Block(FloorBlock):
 		if wabove:
 			other.geom.bottom = self.geom.top
 			other.grounded = True
-			other.vely, other.acy = 0, 0
-			if self.sticky and not other.sticking:
-				self.sitters.append(other)
-				other.sticking = True
+			other.vely, other.acy = self.vely, 0
 		elif wleft and not left:
 			other.geom.right = self.geom.left
-			other.velx = 0
+			other.velx = self.velx
 		elif wright and not right:
 			other.geom.left = self.geom.right
-			other.velx = 0
+			other.velx = self.velx
 		elif wbelow and not below:
 			other.geom.top = self.geom.bottom
-			other.vely = 0
+			other.vely = self.vely
 		else:
 			if not above:
 				other.geom.bottom = self.geom.top
 				other.grounded = True
-				other.vely, other.acy = 0, 0
-				if self.sticky and not other.sticking:
-					self.sitters.append(other)
-					other.sticking = True
+				other.vely, other.acy = self.vely, 0
