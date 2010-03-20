@@ -50,6 +50,8 @@ def main():
 
 	clock = pygame.time.Clock()
 
+	manrise = 0 # <-- debug, this code should be removed eventually....
+
 	while 1:
 
 		screen.blit(background, (0, 0))
@@ -71,6 +73,18 @@ def main():
 						player.geom.top -= 2
 				elif event.key == pygame.K_c:
 					player.geom.center = (200, 100)
+				elif event.key == pygame.K_m:
+					manrise = 0
+				elif event.key == pygame.K_w:
+					manrise = -1
+					for a in croom.geometry:
+						if a.geom.height < 50:
+							a.vely = -500
+				elif event.key == pygame.K_s:
+					manrise = 1
+					for a in croom.geometry:
+						if a.geom.height < 50:
+							a.vely = 500
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
 					player.velx = 0
@@ -90,10 +104,16 @@ def main():
 
 			if a.geom.height < 50:
 				if a.vely < 0 and a.geom.top < 100:
-					a.vely = 100
+					if manrise == 0:
+						a.vely = 100
+					else:
+						a.vely = 0
 				elif a.vely > 0 and a.geom.top > 380:
-					a.vely = -100
-				elif a.vely == 0:
+					if manrise == 0:
+						a.vely = -100
+					else:
+						a.vely = 0
+				elif a.vely == 0 and not manrise:
 					a.vely = -100
 
 			if a.intersects(player):
