@@ -68,9 +68,12 @@ def main():
 				elif event.key == pygame.K_UP:
 					if player.grounded:
 						player.vely = -300
+						player.geom.top -= 1
 						print "Hop!"
 					else:
 						print "Not on ground."
+				elif event.key == pygame.K_c:
+					player.geom.center = (200, 100)
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
 					player.velx = 0
@@ -88,7 +91,7 @@ def main():
 		for a in croom.geometry:
 			if a is player: continue
 
-			if not isinstance(a, entities.Block) and False:
+			if a.geom.height < 50:
 				if a.vely < 0 and a.geom.top < 100:
 					a.vely = 100
 				elif a.vely > 0 and a.geom.top > 380:
