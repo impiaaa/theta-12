@@ -78,6 +78,7 @@ class FloorBlock(Entity):
 class Block(FloorBlock):
 	def __init__(self, geom, anim):
 		FloorBlock.__init__(self, geom, anim)
+		self.sticky = False
 
 	def update(self, time):
 		Entity.update(self, time)
@@ -92,9 +93,10 @@ class Block(FloorBlock):
 
 	def collision(self, other):
 		if other.geom.bottom < self.geom.top:
-			other.geom.bottom = self.geom.top
 			other.grounded = True
-			other.vely = self.vely
+			if self.sticky or other.vely >= 0 and self.vely < other.vely:
+				other.vely = self.vely
+				other.geom.bottom = self.geom.top
 			return
 
 		above = other.geom.bottom < self.geom.top
@@ -110,7 +112,8 @@ class Block(FloorBlock):
 		if wabove:
 			other.geom.bottom = self.geom.top
 			other.grounded = True
-			other.vely, other.acy = self.vely, 0
+			if self.sticky or other.vely >= 0 and self.vely < other.vely:
+				other.vely, other.acy = self.vely, 0
 		elif wleft and not left:
 			other.geom.right = self.geom.left
 			other.velx = self.velx
@@ -124,4 +127,5 @@ class Block(FloorBlock):
 			if not above:
 				other.geom.bottom = self.geom.top
 				other.grounded = True
-				other.vely, other.acy = self.vely, 0
+				if other.vely > 0:
+					other.vely, other.acy = self.vely, 0
