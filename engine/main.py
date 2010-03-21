@@ -64,9 +64,9 @@ def main():
 				return
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
-					player.velx = -50
+					player.velx = -200
 				elif event.key == pygame.K_RIGHT:
-					player.velx = 50.0
+					player.velx = 200
 				elif event.key == pygame.K_UP:
 					if player.grounded:
 						player.vely = -300
@@ -126,6 +126,20 @@ def main():
 			player.acy = 192 # 9.8 m/s, according to the art team's scale
 		else:
 			player.acy = 0
+
+		wid, hig = screen.get_size()
+		wd = player.geom.centerx - wid/2
+		hd = 0
+		if player.geom.top < 0:
+			hd = player.geom.top
+		elif player.geom.bottom > hig:
+			hd = player.geom.bottom - hig 
+
+		for a in croom.all:
+			a.geom.x -= wd
+			a.geom.y -= hd
+		player.geom.centerx = wid/2
+		player.geom.centery -= hd
 
 		# draw everything
 		for e in croom.all:
