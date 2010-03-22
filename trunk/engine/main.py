@@ -69,7 +69,7 @@ def main():
 					player.velx = 200
 				elif event.key == pygame.K_UP:
 					if player.grounded:
-						player.vely = -300
+						player.vely = -600
 						player.geom.top -= 2
 				elif event.key == pygame.K_c:
 					player.geom.center = (200, 100)
@@ -125,7 +125,7 @@ def main():
 				a.collision(player)
 
 		if not player.grounded:
-			player.acy = 192 # 9.8 m/s, according to the art team's scale
+			player.acy = 386 # 9.8 m/s, according to the art team's scale
 		else:
 			player.acy = 0
 
