@@ -30,8 +30,13 @@ class Level:
 		self.rooms.append(self.croom)
 
 
+# This is the code for the "test level" that is currently displayed when main.py is run.
 tlevel = Level()
 troom = tlevel.croom
+trig = entities.MotionTrigger((100, 100, 50, 50), None) # this trigger has its .anim set to None, 
+														# but most motion triggers will probably be invisible (-1)
+troom.all.append(trig)
+troom.geometry.append(trig)
 for i in range(0, 20):
 	tblock = entities.Block((50*i, 400, 50, 20), None)
 	if i % 2 == 0:
@@ -40,5 +45,8 @@ for i in range(0, 20):
 	troom.geometry.append(tblock)
 
 fblock = entities.Block((300, 200, 50, 100), None)
+def reactor(par=None):
+	fblock.geom.topleft = (200, 200)
+trig.reactors.append(reactor)
 troom.all.append(fblock)
 troom.geometry.append(fblock)
