@@ -31,7 +31,7 @@ def randomEntity():
 
 current_level = level.tlevel
 player = entities.Entity((420.0, 100.0, 30.0, 20.0), None)
-
+player.name = "player"
 
 def main():
 	pygame.init()
@@ -135,11 +135,8 @@ def main():
 		elif player.geom.bottom > hig:
 			hd = player.geom.bottom - hig 
 
-		for a in croom.all:
-			a.geom.x -= wd
-			a.geom.y -= hd
-		player.geom.centerx = wid/2
-		player.geom.centery -= hd
+		artist.offsetx = -wd
+		artist.offsety = -hd
 
 		# draw everything
 		for e in croom.all:

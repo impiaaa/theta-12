@@ -3,6 +3,9 @@ import graphwrap, math
 
 class Entity:
 	def __init__(self, geom, anim):
+		""" geom should be a rectangle or a tuple in rectangle format: (x, y, w, h) or pygame.rect.Rect
+			anim should be an AnimSprite (see graphwrap.py) or None or -1. If it is None, a simple
+			bounding rectangle will be shown. If it is -1, it will be entirely invisible. """
 		self.geom = geom # pygame.rect.Rect or tuple
 		if not isinstance(geom, pygame.rect.Rect):
 			self.geom = pygame.rect.Rect(geom) # convert to pygame.rect.Rect
@@ -14,16 +17,19 @@ class Entity:
 		self.grounded = False # used by things that can fall
 		self.sticking = False # true if it is sitting on a "sticky" surface
 		self._incx, self._incy = 0, 0 # necessary because pygame.rect.Rect uses integers =/
+		self.name = None # may be used for identification. Only used for "player", for now.
 		
 	def draw(self, artist):
 		if self.anim is None:
-			artist.drawRect(self.geom.topleft, self.geom.size) # this is throwing an exception in graphwrap.Artist for some reason
+			artist.drawRect(self.geom.topleft, self.geom.size)
+		elif self.anim == -1:
+			return
 
 		artist.addDirtyRect(self.geom)
 		artist.addDirtyRect(self.last)
 
 	def updateArt(self, time):
-		if self.anim is not None:
+		if self.anim is not None and self.anim != -1:
 			self.anim.update(time)
 
 	def update(self, time):
@@ -129,3 +135,25 @@ class Block(FloorBlock):
 				other.grounded = True
 				if other.vely > 0:
 					other.vely, other.acy = self.vely, 0
+
+class TriggerEntity(Entity):
+	def __init__(self, geom, anim):
+		""" This entity has one added method: trigger(par=None). 
+			It simply iterates through all the functions in the list TriggerEntity.reactors and
+			calls them, along with the optional "par" variable. It is up to the subclasses of
+			this function to actually call the trigger() method and to decide whether to actually
+			use the "par" argument. """
+		Entity.__init__(self, geom, anim)
+		self.reactors = [] # list of functions that are called when this is triggered
+
+	def trigger(self, par=None):
+		for r in self.reactors:
+			r(par)
+
+class MotionTrigger(TriggerEntity):
+	def __init__(self, geom, anim):
+		TriggerEntity.__init__(self, geom, anim)
+
+	def collision(self, other):
+		if other.name == "player":
+			TriggerEntity.trigger(self)

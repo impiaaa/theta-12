@@ -83,24 +83,33 @@ class Artist:
 		self.color = (0, 0, 0)
 		self.stroke = 1
 		self.dirty_rects = dirty_rects
+		self.offsetx, self.offsety = 0, 0
 
 	def addDirtyRect(self, rect):
-		self.dirty_rects.append((rect[0]-3, rect[1]-3, rect[2]+6, rect[3]+6))
+		dr = (rect[0]-3 + self.offsetx, rect[1]-3 + self.offsety, rect[2]+6, rect[3]+6)
+
+		# This is here because we don't need to repaint things that are off-screen.
+		if dr[0] + dr[2] < 0 or dr[1] + dr[3] < 0 or dr[0] > self.width or dr[1] > self.height:
+			return
+		self.dirty_rects.append(dr)
 
 
 	def drawLine(self, line):
 		""" line in the form ((x1, y1), (x2, y2), (x3, y3), (x4, y4)) """
 
 		#print "stuff: " + str(line[0]) + ", " + str(line[1])
-		pygame.draw.line(self.screen, self.color, line[0], line[1], self.stroke)
+		pygame.draw.line(self.screen, self.color, (line[0][0]+self.offsetx, line[0][1]+self.offsety),
+				(line[1][0]+self.offsetx, line[1][1]+self.offsety), self.stroke)
 
 	def drawRect(self, upper_left, dimensions):
 		""" draws rectangle; upper_left in (x, y), dimensions in (width, height) """
-		pygame.draw.rect(self.screen, self.color, (upper_left[0], upper_left[1], dimensions[0], dimensions[1]), self.stroke)
+		pygame.draw.rect(self.screen, self.color, (upper_left[0]+self.offsetx, upper_left[1] + self.offsety,
+			 dimensions[0], dimensions[1]), self.stroke)
 
 	def drawOval(self, upper_left, dimensions):
 		""" Draws the oval with given upper-left corner and dimensions """
-		pygame.draw.ellipse(self.screen, self.color, (upper_left[0], upper_left[1], dimensions[0], dimensions[1]), self.stroke)
+		pygame.draw.ellipse(self.screen, self.color, (upper_left[0]+self.offsetx, upper_left[1]+self.offsety, 
+				dimensions[0], dimensions[1]), self.stroke)
 
 	def drawPolyPoints(self, points):
 		lp = points[-1]
