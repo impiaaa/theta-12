@@ -17,6 +17,20 @@ class Room:
 		self.activators = [] # entities that do something when the player comes near them or clicks them or something (like buttons or traps)
 		self.geometry = [] # objects everything can collide with
 
+	def add(self, entity):
+		""" Adds the entity to the appropriate lists based on its attributes """
+		self.all.append(entity)
+		if entity.attributes.count("background") >= 1:
+			self.background.append(entity)
+		if entity.attributes.count("touch_player") >= 1:
+			self.touch_player.append(entity)
+		if entity.attributes.count("touch_enemies") >= 1:
+			self.touch_enemies.append(entity)
+		if entity.attributes.count("activators") >= 1:
+			self.activators.append(entity)
+		if entity.attributes.count("geometry") >= 1:
+			self.geometry.append(entity)
+
 
 
 class Level:
@@ -50,3 +64,6 @@ def reactor(par=None):
 trig.reactors.append(reactor)
 troom.all.append(fblock)
 troom.geometry.append(fblock)
+
+elevator = entities.Elevator((1000, 100, 150, 200), 400, 2)
+troom.add(elevator)

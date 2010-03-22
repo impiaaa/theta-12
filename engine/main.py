@@ -90,10 +90,13 @@ def main():
 					player.velx = 0
 
 
-
-		# update movement
+		# update movement/spawn things
 		for e in croom.all:
 			e.update(0.016)
+			if len(e.spawn) > 0:
+				for s in e.spawn:
+					croom.add(s)
+				e.spawn = []
 
 		player.update(0.016)
 
@@ -102,6 +105,7 @@ def main():
 		for a in croom.geometry:
 			if a is player: continue
 
+			""" debug code not wanted for now
 			if a.geom.height < 50:
 				if a.vely < 0 and a.geom.top < 100:
 					if manrise == 0:
@@ -115,12 +119,10 @@ def main():
 						a.vely = 0
 				elif a.vely == 0 and not manrise:
 					a.vely = -100
+			"""
 
 			if a.intersects(player):
 				a.collision(player)
-
-			#if a.geom.top - player.geom.bottom <= 3:
-			#	player.grounded = True
 
 		if not player.grounded:
 			player.acy = 192 # 9.8 m/s, according to the art team's scale
@@ -131,12 +133,22 @@ def main():
 		wd = player.geom.centerx - wid/2
 		hd = 0
 		if player.geom.top < 0:
-			hd = player.geom.top
+			hd = player.geom.top - 50
 		elif player.geom.bottom > hig:
-			hd = player.geom.bottom - hig 
+			hd = player.geom.bottom - hig + 50 
 
-		artist.offsetx = -wd
-		artist.offsety = -hd
+		xinc = abs(artist.offsetx+wd)/5
+		yinc = abs(artist.offsety+hd)/5
+
+		if artist.offsetx < -wd:
+			artist.offsetx += xinc
+		elif artist.offsetx > -wd:
+			artist.offsetx -= xinc
+
+		if artist.offsety < -hd:
+			artist.offsety += yinc
+		elif artist.offsety > -hd:
+			artist.offsety -= yinc
 
 		# draw everything
 		for e in croom.all:
