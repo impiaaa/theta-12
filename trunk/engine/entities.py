@@ -47,8 +47,7 @@ class Entity:
 			return
 		else:
 			m = self.anim.getImage()
-			artist.drawImage(m, self.geom.topleft)
-			artist.addDirtyRect((self.geom.left, self.geom.top, m.get_width(), m.get_height()))
+			artist.drawImage(m, self.geom.topleft, self.geom.size)
 
 		artist.addDirtyRect(self.geom)
 		artist.addDirtyRect(self.last)
