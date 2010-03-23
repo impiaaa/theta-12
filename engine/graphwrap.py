@@ -12,10 +12,9 @@ class ImageLoader:
 		""" File format should be in the form globals/sprites/foo.png or whatever.
 			if reload is true, then the image is reloaded regardless of whether it is
 			already in the dictionary. """
-		path = ".." + os.path.sep + path # main theta-12 directory is root
+		path = os.path.join("..", path) # main theta-12 directory is root
 		if reload or not self.loaded_images.has_key(path):
-			image = pygame.image.load(path).convert()
-			image.set_colorkey((0, 0, 0))
+			image = pygame.image.load(path).convert_alpha()
 			self.loaded_images[path] = image
 		return self.loaded_images[path]
 
@@ -37,10 +36,16 @@ class AnimSprite:
 		if self.current_seq is not None:
 			self.current_image = self.current_seq.updateImage(time)
 
+	def putSequence(self, key, sequence):
+		self.sequences[key] = sequence
+
 	def runSequence(self, seq):
 		""" The paramater can be either a sequence id or an AnimSequence object. """
 		if isinstance(seq, int):
 			self.current_seq = t12.anim_sequences[seq].clone()
+		elif isinstance(seq, str):
+			if self.sequences.has_key(seq):
+				self.current_seq = self.sequences[seq]
 		else:
 			self.current_seq = seq.clone()
 
@@ -80,6 +85,9 @@ class AnimSequence:
 		return self.images[i]
 
 	def updateImage(self, secs_passed):
+		if self.duration == -1:
+			self.__current_image_index = 0
+			return self.currentImage()
 		self.__time_ellapsed += secs_passed
 		frame_length = self.duration/len(self.images)
 
@@ -98,6 +106,16 @@ class AnimSequence:
 			which would look weird. """
 		seq = AnimSequence(self.images, self.duration, False)
 		return seq
+
+
+def staticSequence(image):
+	return AnimSequence((image,), -1)
+
+def staticSprite(image):
+	anim = AnimSprite()
+	anim.putSequence("default", staticSequence(image))
+	anim.runSequence("default")
+	return anim
 
 
 def _findRect(points):
@@ -164,5 +182,7 @@ class Artist:
 			self.drawLine(l)
 
 	def drawImage(self, image, pos, dim=None):
+		if dim != None:
+			image = pygame.transform.scale(image, dim)
 		pos = (pos[0] + self.offsetx, pos[1] + self.offsety)
 		self.screen.blit(image, pos)

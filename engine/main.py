@@ -49,11 +49,16 @@ def main():
 
 
 	#test code for loading velociraptor anim
-	seq = graphwrap.AnimSequence((t12.imageLoader.getImage("global/sprites/Velociraptor2.png"),), 1000)
+	seq = graphwrap.staticSequence(t12.imageLoader.getImage("global/sprites/Velociraptor2.png"))
+	seq2 = graphwrap.staticSequence(pygame.transform.flip(t12.imageLoader.getImage("global/sprites/Velociraptor2.png"), 1, 0))
 	an = graphwrap.AnimSprite()
-	an.runSequence(seq)
+	an.putSequence("left", seq)
+	an.putSequence("right", seq2)
+	an.runSequence("left")
+	
 	
 	t12.current_level = level.tlevel
+	t12.current_level.load()
 	t12.player = entities.Entity((420.0, 100.0, 30.0, 20.0), an)
 	t12.player.name = "player"
 
@@ -72,11 +77,13 @@ def main():
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
 					t12.player.velx = -200
+					an.runSequence("left")
 				elif event.key == pygame.K_RIGHT:
 					t12.player.velx = 200
+					an.runSequence("right")
 				elif event.key == pygame.K_UP:
 					if t12.player.grounded:
-						t12.player.vely = -600
+						t12.player.vely = -400
 						t12.player.geom.top -= 2
 				elif event.key == pygame.K_c:
 					t12.player.geom.center = (200, 100)

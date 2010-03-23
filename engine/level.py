@@ -1,4 +1,4 @@
-import entities
+import entities, graphwrap, t12
 
 # this is just a basic template for now and will likely be expanded upon.
 
@@ -43,27 +43,54 @@ class Level:
 		self.croom = Room() # current room
 		self.rooms.append(self.croom)
 
+	def load(self):
+		print "no loader"
+
 
 # This is the code for the "test level" that is currently displayed when main.py is run.
 tlevel = Level()
-troom = tlevel.croom
-trig = entities.MotionTrigger((100, 100, 50, 50), None) # this trigger has its .anim set to None, 
-														# but most motion triggers will probably be invisible (-1)
-troom.all.append(trig)
-troom.geometry.append(trig)
-for i in range(0, 20):
-	tblock = entities.Block((50*i, 400, 50, 20), None)
-	if i % 2 == 0:
-		tblock.sticky = True
-	troom.all.append(tblock)
-	troom.geometry.append(tblock)
 
-fblock = entities.Block((300, 200, 50, 100), None)
-def reactor(par=None):
-	fblock.geom.topleft = (200, 200)
-trig.reactors.append(reactor)
-troom.all.append(fblock)
-troom.geometry.append(fblock)
+def tload():
+	troom = tlevel.croom
+	trig = entities.MotionTrigger((200, 350, 50, 50),
+			graphwrap.staticSprite(t12.imageLoader.getImage("global/sprites/button.png"))) # this trigger has its .anim set to None, 
+															# but most motion triggers will probably be invisible (-1)
+	trig2 = entities.MotionTrigger((325, 350, 50, 50),
+			graphwrap.staticSprite(t12.imageLoader.getImage("global/sprites/button-pressed.png")))
+	trig3 = entities.MotionTrigger((-1000, 1000, 30000, 100), -1)
 
-elevator = entities.Elevator((1000, 100, 150, 200), 400, 2)
-troom.add(elevator)
+	trig.adjustGeomToImage()
+	trig2.adjustGeomToImage()
+	trig.geom.bottom, trig2.geom.bottom = 400, 400
+	troom.all.append(trig)
+	troom.geometry.append(trig)
+	troom.geometry.append(trig2)
+	troom.all.append(trig2)
+	troom.all.append(trig3)
+	troom.geometry.append(trig3)
+	for i in range(12):
+		tblock = entities.Block((50*i, 400, 50, 20), None)
+		if i % 2 == 0:
+			tblock.sticky = True
+		troom.all.append(tblock)
+		troom.geometry.append(tblock)
+	
+	fblock = entities.Block((300, 200, 50, 50), graphwrap.staticSprite(t12.imageLoader.getImage("global/sprites/box.png")))
+	def reactor(par=None):
+		fblock.geom.topleft = (200, 200)
+	def reactor2(par=None):
+		fblock.geom.topleft = (300, 200)
+	def react3(par=None):
+		if t12.player != None:
+			t12.player.geom.bottom = fblock.geom.top-5
+			t12.player.geom.centerx = fblock.geom.centerx
+	trig.reactors.append(reactor)
+	trig2.reactors.append(reactor2)
+	trig3.reactors.append(react3)
+	troom.all.append(fblock)
+	troom.geometry.append(fblock)
+	
+	elevator = entities.Elevator((600, 200, 150, 200), 100, 0.5)
+	troom.add(elevator)
+
+tlevel.load = tload
