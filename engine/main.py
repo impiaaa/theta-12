@@ -1,7 +1,7 @@
 import sys, os, random, math
 import pygame
 from pygame.locals import *
-import physics, entities, graphwrap, level
+import t12, physics, entities, graphwrap, level
 
 # helper functions
 def empty(stuff):
@@ -29,9 +29,6 @@ def randomEntity():
 	print str(e.geom.getPoints())
 	return e
 
-current_level = level.tlevel
-player = entities.Entity((420.0, 100.0, 30.0, 20.0), None)
-player.name = "player"
 
 def main():
 	pygame.init()
@@ -50,13 +47,23 @@ def main():
 
 	clock = pygame.time.Clock()
 
-	manrise = 0 # <-- debug, this code should be removed eventually....
+
+	#test code for loading velociraptor anim
+	seq = graphwrap.AnimSequence((t12.imageLoader.getImage("global/sprites/Velociraptor2.png"),), 1000)
+	an = graphwrap.AnimSprite()
+	an.runSequence(seq)
+	
+	t12.current_level = level.tlevel
+	t12.player = entities.Entity((420.0, 100.0, 30.0, 20.0), an)
+	t12.player.name = "player"
+
+	t12.player.adjustGeomToImage()
 
 	while 1:
 
 		screen.blit(background, (0, 0))
 
-		croom = current_level.croom
+		croom = t12.current_level.croom
 
 		# process events
 		for event in pygame.event.get():
@@ -64,15 +71,15 @@ def main():
 				return
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
-					player.velx = -200
+					t12.player.velx = -200
 				elif event.key == pygame.K_RIGHT:
-					player.velx = 200
+					t12.player.velx = 200
 				elif event.key == pygame.K_UP:
-					if player.grounded:
-						player.vely = -600
-						player.geom.top -= 2
+					if t12.player.grounded:
+						t12.player.vely = -600
+						t12.player.geom.top -= 2
 				elif event.key == pygame.K_c:
-					player.geom.center = (200, 100)
+					t12.player.geom.center = (200, 100)
 				elif event.key == pygame.K_m:
 					manrise = 0
 				elif event.key == pygame.K_w:
@@ -87,7 +94,7 @@ def main():
 							a.vely = 500
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-					player.velx = 0
+					t12.player.velx = 0
 
 
 		# update movement/spawn things
@@ -98,12 +105,12 @@ def main():
 					croom.add(s)
 				e.spawn = []
 
-		player.update(0.016)
+		t12.player.update(0.016)
 
 				
 		# detect collisions
 		for a in croom.geometry:
-			if a is player: continue
+			if a is t12.player: continue
 
 			""" debug code not wanted for now
 			if a.geom.height < 50:
@@ -121,21 +128,21 @@ def main():
 					a.vely = -100
 			"""
 
-			if a.intersects(player):
-				a.collision(player)
+			if a.intersects(t12.player):
+				a.collision(t12.player)
 
-		if not player.grounded:
-			player.acy = 386 # 9.8 m/s, according to the art team's scale
+		if not t12.player.grounded:
+			t12.player.acy = 386 # 9.8 m/s, according to the art team's scale
 		else:
-			player.acy = 0
+			t12.player.acy = 0
 
 		wid, hig = screen.get_size()
-		wd = player.geom.centerx - wid/2
+		wd = t12.player.geom.centerx - wid/2
 		hd = 0
-		if player.geom.top < 0:
-			hd = player.geom.top - 50
-		elif player.geom.bottom > hig:
-			hd = player.geom.bottom - hig + 50 
+		if t12.player.geom.top < 0:
+			hd = t12.player.geom.top - 50
+		elif t12.player.geom.bottom > hig:
+			hd = t12.player.geom.bottom - hig + 50 
 
 		xinc = abs(artist.offsetx+wd)/5
 		yinc = abs(artist.offsety+hd)/5
@@ -154,8 +161,8 @@ def main():
 		for e in croom.all:
 			e.updateArt(0.016)
 			e.draw(artist)
-		player.updateArt(0.016)
-		player.draw(artist)
+		t12.player.updateArt(0.016)
+		t12.player.draw(artist)
 
 		pygame.display.update(last_drects)
 		pygame.display.update(drects)

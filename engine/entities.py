@@ -1,8 +1,5 @@
 import pygame
-import graphwrap, math
-
-currentid = 0
-game_entities = {}
+import graphwrap, math, t12
 
 def entity_named(name):
 	""" Returns the game entity with the specified name. """
@@ -16,6 +13,7 @@ class Entity:
 			anim should be an AnimSprite (see graphwrap.py) or None or -1. If it is None, a simple
 			bounding rectangle will be shown. If it is -1, it will be entirely invisible. 
 			All subclasses MUST call this constructer or things will BREAK. """
+
 		self.geom = geom # pygame.rect.Rect or tuple
 		if not isinstance(geom, pygame.rect.Rect):
 			self.geom = pygame.rect.Rect(geom) # convert to pygame.rect.Rect
@@ -32,15 +30,25 @@ class Entity:
 						  # this allows entities to create other entities and be multi-part.
 		self.attributes = [] # this contains a list of the names of what lists this should go in (geometry, activators, etc)
 							 # see level.Room.add()
-		#self.id = currentid
-		#game_entites[self.id] = self
-		#currentid += 1
+		self.id = t12.ent_currentid
+		t12.game_entities[self.id] = self
+		t12.ent_currentid += 1
 		
+	def adjustGeomToImage(self):
+		if self.anim == None or self.anim == -1: return
+		m = self.anim.getImage()
+		if m == None: return
+		self.geom.width, self.geom.height = m.get_size()
+
 	def draw(self, artist):
 		if self.anim is None:
 			artist.drawRect(self.geom.topleft, self.geom.size)
 		elif self.anim == -1:
 			return
+		else:
+			m = self.anim.getImage()
+			artist.drawImage(m, self.geom.topleft)
+			artist.addDirtyRect((self.geom.left, self.geom.top, m.get_width(), m.get_height()))
 
 		artist.addDirtyRect(self.geom)
 		artist.addDirtyRect(self.last)

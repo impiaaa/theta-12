@@ -1,29 +1,57 @@
 import pygame
 from pygame.locals import *
+import os
+import t12
+
+class ImageLoader:
+	def __init__(self):
+		""" There is a global ImageLoader. Do not make a new one using this constructor, please. """
+		self.loaded_images = {}
+
+	def getImage(self, path, reload=False):
+		""" File format should be in the form globals/sprites/foo.png or whatever.
+			if reload is true, then the image is reloaded regardless of whether it is
+			already in the dictionary. """
+		path = ".." + os.path.sep + path # main theta-12 directory is root
+		if reload or not self.loaded_images.has_key(path):
+			image = pygame.image.load(path).convert()
+			image.set_colorkey((0, 0, 0))
+			self.loaded_images[path] = image
+		return self.loaded_images[path]
+
+	def empty(self):
+		self.loaded_images.clear()
+
+if t12.imageLoader == None:
+	t12.imageLoader = ImageLoader()
 
 class AnimSprite:
 	def __init__(self):
 		# define self.sequences as a dictionary of AnimSequence's
 		# self.sequences will contains entries like "walk left" and "jump right" and "attack up"
 		# define self.current_sequence
-		print "NOT IMPLEMENTED YET"
+		self.sequences = {}
+		self.current_seq = None
 
 	def update(self, time):
-		if self.current_sequence is not None:
-			self.current_image = self.current_sequence.updateImage(self, secs_passed)
+		if self.current_seq is not None:
+			self.current_image = self.current_seq.updateImage(time)
 
-	def runSequence(seq_id):
-		# set self.current_sequence to the sequence associated with the given id
-		# ...
+	def runSequence(self, seq):
+		""" The paramater can be either a sequence id or an AnimSequence object. """
+		if isinstance(seq, int):
+			self.current_seq = t12.anim_sequences[seq].clone()
+		else:
+			self.current_seq = seq.clone()
 
-		update(self, 0) # update the current image
+		self.update(0) # update the current image
 
 	def getImage(self):
 		return self.current_image
 
 
 class AnimSequence:
-	def __init__(self, images, time):
+	def __init__(self, images, time, makeId=True):
 		""" images are the individual frames, time is
 			 the duration of the entire sequence in seconds """
 		self.images = images
@@ -31,10 +59,17 @@ class AnimSequence:
 		self.duration = time
 		self.__time_ellapsed = 0
 		self.loops = 0 # number of loops completed so far
+		if makeId:
+			self.id = t12.seq_currentid
+			t12.seq_currentid += 1
+			t12.anim_sequences[self.id] = self
+		else:
+			self.id = -1
+
 	
 
 	def currentImage(self):
-		return self.image[__current_image_index]
+		return self.images[self.__current_image_index]
 
 	def nextImage(self):
 		i = self.__current_image_index + 1
@@ -48,8 +83,8 @@ class AnimSequence:
 		self.__time_ellapsed += secs_passed
 		frame_length = self.duration/len(self.images)
 
-		if __time_ellapsed >= frame_length:
-			__time_ellapsed -= frame_length
+		if self.__time_ellapsed >= frame_length:
+			self.__time_ellapsed -= frame_length
 			self.nextImage()
 
 		return self.currentImage()
@@ -57,6 +92,12 @@ class AnimSequence:
 	def restart(self):
 		self.__current_image_index = 0
 		self.loops = 0
+
+	def clone(self):
+		""" This is necessary because otherwise all sequences will be on the same frame, 
+			which would look weird. """
+		seq = AnimSequence(self.images, self.duration, False)
+		return seq
 
 
 def _findRect(points):
@@ -122,6 +163,6 @@ class Artist:
 		for l in lines:
 			self.drawLine(l)
 
-	def drawImage(self, image, x, y, width, height):
-		# ...
-		print "NOT IMPLEMENTED YET"
+	def drawImage(self, image, pos, dim=None):
+		pos = (pos[0] + self.offsetx, pos[1] + self.offsety)
+		self.screen.blit(image, pos)
