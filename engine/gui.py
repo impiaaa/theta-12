@@ -9,7 +9,7 @@ pygame.init()
 dirty_rects = []
 screen = pygame.display.set_mode((640, 480))
 pygame.display.set_caption("Theta 12")
-background = pygame.Surface(self.screen.get_size())s
+background = pygame.Surface(self.screen.get_size())
 background = background.convert()
 background.fill((250, 250, 250))
 
