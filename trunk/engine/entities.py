@@ -1,5 +1,6 @@
 import pygame
 import graphwrap, math, t12
+import math
 
 def entity_named(name):
 	""" Returns the game entity with the specified name. """
@@ -33,12 +34,14 @@ class Entity:
 		self.id = t12.ent_currentid
 		t12.game_entities[self.id] = self
 		t12.ent_currentid += 1
+		self.stretchArt = True # stretch the art to fill the geometry, or center the art if the sizes aren't the same?
 		
 	def adjustGeomToImage(self):
 		if self.anim == None or self.anim == -1: return
 		m = self.anim.getImage()
 		if m == None: return
 		self.geom.width, self.geom.height = m.get_size()
+		self.last.size = self.geom.size
 
 	def draw(self, artist):
 		if self.anim is None:
@@ -47,7 +50,10 @@ class Entity:
 			return
 		else:
 			m = self.anim.getImage()
-			artist.drawImage(m, self.geom.topleft, self.geom.size)
+			if self.stretchArt:
+				artist.drawImage(m, self.geom.topleft, self.geom.size)
+			else:
+				artist.drawImage(m, (self.geom.centerx - m.get_width()/2, self.geom.centery - m.get_height()/2))
 
 		artist.addDirtyRect(self.geom)
 		artist.addDirtyRect(self.last)
@@ -216,7 +222,7 @@ class Elevator(Entity):
 		if Entity.intersects(self, other_entity):
 			return True
 		if self.geom.top - other_entity.geom.bottom <= 3 and (self.geom.right > other_entity.geom.right > self.geom.left
-				or self.geom.right > other_entity.geom.left > self.geom.left):
+				or self.geom.right > other_entity.geom.left > self.geom.left) and self.geom.bottom > other_entity.geom.top:
 			return True
 		return False
 
@@ -260,4 +266,68 @@ class Elevator(Entity):
 		if self.playerref != None:
 			if not self.intersects(self.playerref):
 				self.playerref = None
-	
+
+class Actor(Entity):
+	def __init__(self, geom, anim, feet=None):
+		""" geom and anim are as normal, and the "feet" paramater should
+			be a tuple for the startx and endx of the feet on the sprite.
+			If it is set to None, the feet are assumed to be the bounds of
+			the geometry. """
+		Entity.__init__(self, geom, anim)
+
+		# the self.specialFeet boolean keeps track of whether the feet value
+		# should change if the geometry is changed.
+		if feet == None:
+			self.specialFeet = False
+			self.feet = (0, self.geom.width)
+		else:
+			self.specialFeet = True
+			self.feet = feet
+
+		self.feetbox = pygame.rect.Rect((0, 0, 1, 1))
+
+		self.health = 10 # arbitrary default
+		self.jumpheight = 50 # arbitrary
+		self.speed = 100 # horizontal movement speed. may be replaced by acceleration at some point.
+
+		self.update(0) # for the feetbox
+
+	def update(self, time):
+		Entity.update(self, time)
+		if not self.specialFeet:
+			self.feetbox.width = self.geom.width
+		else:
+			self.feetbox.width = self.feet[1] - self.feet[0]
+		self.feetbox.left = self.geom.left + self.feet[0]
+		self.feetbox.top, self.feetbox.height = self.geom.bottom - 2, 2
+
+	def jump(self):
+		self.vely = -math.sqrt(t12.gravity * self.jumpheight * 2)
+		self.geom.top -= 3
+
+	def left(self):
+		self.velx = -self.speed
+
+	def right(self):
+		self.velx = self.speed
+
+	def stopX(self):
+		self.velx = 0
+
+	def decelerate(self, x, y):
+		""" Decelerates in the given x/y directions. It will NOT
+			accelerate in the other direction if the result is less
+			than zero. It will just stop. """
+		x, y = abs(x), abs(y)
+
+		if abs(self.velx) - x < 0:
+			self.velx = 0
+		elif self.velx != 0:
+			sign = abs(self.velx)/self.velx
+			self.velx -= sign * x
+
+		if abs(self.vely) - y < 0:
+			self.vely = 0
+		elif self.vely != 0:
+			sign = abs(self.vely)/self.vely
+			self.vely -= sign * y

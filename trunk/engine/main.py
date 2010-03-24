@@ -2,6 +2,7 @@ import sys, os, random, math
 import pygame
 from pygame.locals import *
 import t12, physics, entities, graphwrap, level
+import time
 
 # helper functions
 def empty(stuff):
@@ -59,12 +60,25 @@ def main():
 	
 	t12.current_level = level.tlevel
 	t12.current_level.load()
-	t12.player = entities.Entity((420.0, 100.0, 30.0, 20.0), an)
+	t12.player = entities.Actor((420.0, 100.0, 30.0, 20.0), an)
 	t12.player.name = "player"
+	t12.player.jumpheight = 250 # wikianswers says this number should be 72, but that is boring.
+	t12.player.speed = 396 # 396 in/2s according to wikianswers
 
 	t12.player.adjustGeomToImage()
 
+	firstframe = True
+	last_time = 0
+	seconds = 0
+	ctime = 0
+
 	while 1:
+		ctime = time.time()
+		seconds = ctime - last_time
+		last_time = time.time()
+		if firstframe:
+			seconds = 0
+			firstframe = False
 
 		screen.blit(background, (0, 0))
 
@@ -76,15 +90,14 @@ def main():
 				return
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
-					t12.player.velx = -200
+					t12.player.left()
 					an.runSequence("left")
 				elif event.key == pygame.K_RIGHT:
-					t12.player.velx = 200
+					t12.player.right()
 					an.runSequence("right")
 				elif event.key == pygame.K_UP:
 					if t12.player.grounded:
-						t12.player.vely = -400
-						t12.player.geom.top -= 2
+						t12.player.jump()
 				elif event.key == pygame.K_c:
 					t12.player.geom.center = (200, 100)
 				elif event.key == pygame.K_m:
@@ -106,13 +119,13 @@ def main():
 
 		# update movement/spawn things
 		for e in croom.all:
-			e.update(0.016)
+			e.update(seconds)
 			if len(e.spawn) > 0:
 				for s in e.spawn:
 					croom.add(s)
 				e.spawn = []
 
-		t12.player.update(0.016)
+		t12.player.update(seconds)
 
 				
 		# detect collisions
@@ -139,7 +152,7 @@ def main():
 				a.collision(t12.player)
 
 		if not t12.player.grounded:
-			t12.player.acy = 386 # 9.8 m/s, according to the art team's scale
+			t12.player.acy = t12.gravity
 		else:
 			t12.player.acy = 0
 
@@ -166,9 +179,9 @@ def main():
 
 		# draw everything
 		for e in croom.all:
-			e.updateArt(0.016)
+			e.updateArt(seconds)
 			e.draw(artist)
-		t12.player.updateArt(0.016)
+		t12.player.updateArt(seconds)
 		t12.player.draw(artist)
 
 		pygame.display.update(last_drects)

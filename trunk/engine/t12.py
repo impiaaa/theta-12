@@ -5,3 +5,4 @@ ent_currentid = 0
 game_entities = {}
 seq_currentid = 0
 anim_sequences = {}
+gravity = 386 # 9.8 m/s, according to the art team's scale
