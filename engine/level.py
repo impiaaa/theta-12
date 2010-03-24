@@ -68,7 +68,7 @@ def tload():
 	troom.all.append(trig2)
 	troom.all.append(trig3)
 	troom.geometry.append(trig3)
-	for i in range(12):
+	for i in range(24):
 		tblock = entities.Block((50*i, 400, 50, 20), None)
 		if i % 2 == 0:
 			tblock.sticky = True
