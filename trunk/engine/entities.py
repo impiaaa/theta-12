@@ -35,6 +35,8 @@ class Entity:
 		t12.game_entities[self.id] = self
 		t12.ent_currentid += 1
 		self.stretchArt = True # stretch the art to fill the geometry, or center the art if the sizes aren't the same?
+
+		self.collidedWith = [] # list of things I collided with this frame
 		
 	def adjustGeomToImage(self):
 		if self.anim == None or self.anim == -1: return
@@ -53,7 +55,10 @@ class Entity:
 			if self.stretchArt:
 				artist.drawImage(m, self.geom.topleft, self.geom.size)
 			else:
-				artist.drawImage(m, (self.geom.centerx - m.get_width()/2, self.geom.centery - m.get_height()/2))
+				mrect = (self.geom.centerx - m.get_width()/2, self.geom.centery - m.get_height()/2)
+				artist.drawImage(m, mrect)
+				artist.addDirtyRect((mrect[0], mrect[1], m.get_width(), m.get_height()))
+			
 
 		artist.addDirtyRect(self.geom)
 		artist.addDirtyRect(self.last)
@@ -85,11 +90,22 @@ class Entity:
 			self._incy -= val
 
 		self.grounded = False # reset grounded
+		self.collidedWith = [] # clear list of things I collided with
 
 	def intersects(self, other_entity):
 		return self.geom.colliderect(other_entity.geom)
 
 	def collision(self, other):
+		""" Called by external classes and should never be overriden. """
+		# prevent things from hitting themselves
+		if other is self: return
+		# things cannot hit each other more than once in a frame!
+		if self.collidedWith.count(other) >= 1: return
+		self.collidedWith.append(other)
+		# call the code that actually does something with the collision
+		self._collision(other)
+
+	def _collision(self, other):
 		""" This method is called when this entity hits another entity.
 			Subclasses are expected to override it to make it do something useful. """
 		return None
@@ -98,6 +114,7 @@ class FloorBlock(Entity):
 	def __init__(self, geom, anim):
 		Entity.__init__(self, geom, anim)
 		self.attributes.append("geometry")
+		self.attributes.append("art_mid")
 
 	def intersects(self, other_entity):
 		if Entity.intersects(self, other_entity):
@@ -107,7 +124,7 @@ class FloorBlock(Entity):
 			return True
 		return False
 
-	def collision(self, other):
+	def _collision(self, other):
 		if other.vely >= 0:
 			other.vely = self.vely
 			if other.acy > 0:
@@ -131,7 +148,7 @@ class Block(FloorBlock):
 			return True
 		return False
 
-	def collision(self, other):
+	def _collision(self, other):
 		if other.geom.bottom < self.geom.top:
 			other.grounded = True
 			if self.sticky or other.vely >= 0 and self.vely < other.vely:
@@ -189,7 +206,7 @@ class MotionTrigger(TriggerEntity):
 	def __init__(self, geom, anim):
 		TriggerEntity.__init__(self, geom, anim)
 
-	def collision(self, other):
+	def _collision(self, other):
 		if other.name == "player":
 			TriggerEntity.trigger(self)
 
@@ -226,7 +243,7 @@ class Elevator(Entity):
 			return True
 		return False
 
-	def collision(self, other):
+	def _collision(self, other):
 		if other.name == "player" and self.state == 0 and self.playerref == None:
 			if self.geom.y == self.y1:
 				self.state = 1
@@ -268,23 +285,15 @@ class Elevator(Entity):
 				self.playerref = None
 
 class Actor(Entity):
-	def __init__(self, geom, anim, feet=None):
+	def __init__(self, geom, anim):
 		""" geom and anim are as normal, and the "feet" paramater should
 			be a tuple for the startx and endx of the feet on the sprite.
 			If it is set to None, the feet are assumed to be the bounds of
 			the geometry. """
 		Entity.__init__(self, geom, anim)
 
-		# the self.specialFeet boolean keeps track of whether the feet value
-		# should change if the geometry is changed.
-		if feet == None:
-			self.specialFeet = False
-			self.feet = (0, self.geom.width)
-		else:
-			self.specialFeet = True
-			self.feet = feet
-
-		self.feetbox = pygame.rect.Rect((0, 0, 1, 1))
+		self.attributes.append("actors")
+		self.attributes.append("art_front")
 
 		self.health = 10 # arbitrary default
 		self.jumpheight = 50 # arbitrary
@@ -294,12 +303,6 @@ class Actor(Entity):
 
 	def update(self, time):
 		Entity.update(self, time)
-		if not self.specialFeet:
-			self.feetbox.width = self.geom.width
-		else:
-			self.feetbox.width = self.feet[1] - self.feet[0]
-		self.feetbox.left = self.geom.left + self.feet[0]
-		self.feetbox.top, self.feetbox.height = self.geom.bottom - 2, 2
 
 	def jump(self):
 		self.vely = -math.sqrt(t12.gravity * self.jumpheight * 2)

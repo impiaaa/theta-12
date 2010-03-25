@@ -60,12 +60,19 @@ def main():
 	
 	t12.current_level = level.tlevel
 	t12.current_level.load()
+	croom = t12.current_level.croom
+
 	t12.player = entities.Actor((420.0, 100.0, 30.0, 20.0), an)
 	t12.player.name = "player"
 	t12.player.jumpheight = 250 # wikianswers says this number should be 72, but that is boring.
 	t12.player.speed = 396 # 396 in/2s according to wikianswers
 
 	t12.player.adjustGeomToImage()
+	t12.player.stretchArt = False
+	t12.player.geom.width = 20 # testing things
+
+	croom.add(t12.player)
+	
 
 	firstframe = True
 	last_time = 0
@@ -81,8 +88,6 @@ def main():
 			firstframe = False
 
 		screen.blit(background, (0, 0))
-
-		croom = t12.current_level.croom
 
 		# process events
 		for event in pygame.event.get():
@@ -125,28 +130,10 @@ def main():
 					croom.add(s)
 				e.spawn = []
 
-		t12.player.update(seconds)
-
 				
 		# detect collisions
 		for a in croom.geometry:
 			if a is t12.player: continue
-
-			""" debug code not wanted for now
-			if a.geom.height < 50:
-				if a.vely < 0 and a.geom.top < 100:
-					if manrise == 0:
-						a.vely = 100
-					else:
-						a.vely = 0
-				elif a.vely > 0 and a.geom.top > 380:
-					if manrise == 0:
-						a.vely = -100
-					else:
-						a.vely = 0
-				elif a.vely == 0 and not manrise:
-					a.vely = -100
-			"""
 
 			if a.intersects(t12.player):
 				a.collision(t12.player)
@@ -178,11 +165,20 @@ def main():
 			artist.offsety -= yinc
 
 		# draw everything
-		for e in croom.all:
+		for e in croom.art_back:
 			e.updateArt(seconds)
 			e.draw(artist)
-		t12.player.updateArt(seconds)
-		t12.player.draw(artist)
+		for e in croom.art_mid:
+			e.updateArt(seconds)
+			e.draw(artist)
+		for e in croom.art_front:
+			e.updateArt(seconds)
+			e.draw(artist)
+		for e in croom.art_over:
+			e.updateArt(seconds)
+			e.draw(artist)
+		#t12.player.updateArt(seconds)
+		#t12.player.draw(artist)
 
 		pygame.display.update(last_drects)
 		pygame.display.update(drects)
