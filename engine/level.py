@@ -16,6 +16,15 @@ class Room:
 		self.touch_enemies = [] # entities that can hit enemies (bullets the player shoots, etc)
 		self.activators = [] # entities that do something when the player comes near them or clicks them or something (like buttons or traps)
 		self.geometry = [] # objects everything can collide with
+		self.actors = []
+
+		# these groups are used for layering the graphics.
+		# general guidlines for what to put where:
+		# back - background objects like trees/bushes/decorations/etc
+		# mid - geometry, walls, floors, platforms, buttons...
+		# front - npcs
+		# over - explosions and particle effects and such
+		self.art_back, self.art_mid, self.art_front, self.art_over = [], [], [], []
 
 	def add(self, entity):
 		""" Adds the entity to the appropriate lists based on its attributes """
@@ -30,6 +39,18 @@ class Room:
 			self.activators.append(entity)
 		if entity.attributes.count("geometry") >= 1:
 			self.geometry.append(entity)
+		if entity.attributes.count("actor") >= 1 or entity.attributes.count("actors") >= 1:
+			self.actors.append(entity)
+
+		if entity.attributes.count("art_back") >= 1:
+			self.art_back.append(entity)
+		elif entity.attributes.count("art_front") >= 1:
+			self.art_front.append(entity)
+		elif entity.attributes.count("art_over") >= 1:
+			self.art_over.append(entity)
+		else:
+			self.art_mid.append(entity)
+		
 
 
 
@@ -62,18 +83,21 @@ def tload():
 	trig.adjustGeomToImage()
 	trig2.adjustGeomToImage()
 	trig.geom.bottom, trig2.geom.bottom = 400, 400
-	troom.all.append(trig)
-	troom.geometry.append(trig)
-	troom.geometry.append(trig2)
-	troom.all.append(trig2)
-	troom.all.append(trig3)
-	troom.geometry.append(trig3)
+
+	trig.attributes.append("geometry")
+	trig2.attributes.append("geometry")
+	trig3.attributes.append("geometry")
+
+	troom.add(trig)
+	troom.add(trig2)
+	troom.add(trig3)
+
 	for i in range(24):
 		tblock = entities.Block((50*i, 400, 50, 20), None)
+		tblock.attributes.append("geometry")
 		if i % 2 == 0:
 			tblock.sticky = True
-		troom.all.append(tblock)
-		troom.geometry.append(tblock)
+		troom.add(tblock)
 	
 	fblock = entities.Block((300, 200, 50, 50), graphwrap.staticSprite(t12.imageLoader.getImage("global/sprites/box.png")))
 	def reactor(par=None):
@@ -87,8 +111,9 @@ def tload():
 	trig.reactors.append(reactor)
 	trig2.reactors.append(reactor2)
 	trig3.reactors.append(react3)
-	troom.all.append(fblock)
-	troom.geometry.append(fblock)
+
+	fblock.attributes.append("geometry")
+	troom.add(fblock)
 	
 	elevator = entities.Elevator((600, 200, 150, 200), 100, 0.5)
 	troom.add(elevator)
