@@ -1,5 +1,5 @@
 import pygame
-import graphwrap, math, t12
+import graphwrap, math, t12, physics
 import math
 
 def entity_named(name):
@@ -44,6 +44,39 @@ class Entity:
 		if m == None: return
 		self.geom.width, self.geom.height = m.get_size()
 		self.last.size = self.geom.size
+
+	def _xdist(self):
+		""" returns the x distance travelled since last frame """
+		return self.geom.x - self.last.x
+	def _ydist(self):
+		""" returns the y distance travelled since last frame """
+		return self.geom.y - self.last.y
+
+	def _reline(self, line):
+		""" takes a line in the format (x1, y1, x2, y2) and makes it
+			((x1, y1), (x2, y2)) """
+		return ((line[0], line[1]), (line[2], line[3]))
+
+	def _crossed(self, other):
+		""" Returns true if the paths of these objects crossed in the last frame.
+			This should be used for fast-moving projectiles to make sure they
+			are not going through things. This is /not/ very precise. """
+		mlines = ( (self.last.centerx, self.last.centery, self.geom.centerx, self.geom.centery),
+			(self.geom.left, self.geom.top, self.geom.left, self.geom.bottom),
+			(self.geom.right, self.geom.top, self.geom.right, self.geom.bottom),
+			(self.geom.left, self.geom.top, self.geom.right, self.geom.top),
+			(self.geom.left, self.geom.bottom, self.geom.right, self.geom.bottom) )
+
+		olines = (  (other.last.centerx, other.last.centery, other.geom.centerx, other.geom.centery),
+			(other.geom.left, other.geom.top, other.geom.left, other.geom.bottom),
+			(other.geom.right, other.geom.top, other.geom.right, other.geom.bottom),
+			(other.geom.left, other.geom.top, other.geom.right, other.geom.top),
+			(other.geom.left, other.geom.bottom, other.geom.right, other.geom.bottom) )
+		for m in mlines:
+			for o in olines:
+				if physics.linesIntersect(self._reline(o), self._reline(m)):
+					return True
+		return False
 
 	def draw(self, artist):
 		if self.anim is None:
@@ -92,8 +125,15 @@ class Entity:
 		self.grounded = False # reset grounded
 		self.collidedWith = [] # clear list of things I collided with
 
-	def intersects(self, other_entity):
-		return self.geom.colliderect(other_entity.geom)
+	def intersects(self, other):
+		if self.geom.colliderect(other.geom):
+			return True
+		
+		if (abs(self._xdist()) > self.geom.width or abs(self._ydist()) > self.geom.height
+				or abs(other._xdist()) > other.geom.width or abs(other._ydist()) > other.geom.height):
+			if self._crossed(other):
+				return True
+		return False
 
 	def collision(self, other):
 		""" Called by external classes and should never be overriden. """
