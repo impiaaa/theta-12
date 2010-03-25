@@ -112,8 +112,10 @@ def tload():
 	trig2.reactors.append(reactor2)
 	trig3.reactors.append(react3)
 
-	fblock.attributes.append("geometry")
 	troom.add(fblock)
+
+	wall = entities.Block((100, 200, 50, 200), None)
+	troom.add(wall)
 	
 	elevator = entities.Elevator((600, 200, 150, 200), 100, 0.5)
 	troom.add(elevator)

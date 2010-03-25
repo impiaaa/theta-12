@@ -52,29 +52,87 @@ class Entity:
 		""" returns the y distance travelled since last frame """
 		return self.geom.y - self.last.y
 
-	def _reline(self, line):
-		""" takes a line in the format (x1, y1, x2, y2) and makes it
-			((x1, y1), (x2, y2)) """
-		return ((line[0], line[1]), (line[2], line[3]))
+	def _lint(self, la, lb, thresh=1):
+		""" Returns True if the line segments (a,b,c,d) la and lb intersect. """
+		pa1, pa2 = (la[0], la[1]), (la[2], la[3])
+		pb1, pb2 = (lb[0], lb[1]), (lb[2], lb[3])
+
+		atop = min(pa1[1], pa2[1])
+		abot = max(pa1[1], pa2[1])
+		aleft= min(pa1[0], pa2[0])
+		aright=max(pa1[0], pa2[0])
+
+		btop = min(pb1[1], pb2[1])
+		bbot = max(pb1[1], pb2[1])
+		bleft= min(pb1[0], pb2[0])
+		bright=max(pb1[0], pb2[0])
+
+		# calculate slope, or set to None if it is undefined.
+		if pa2[0]-pa1[0] != 0:
+			ma = (pa2[1]-pa1[1])/(pa2[0]-pa1[0])
+		else:
+			ma = None
+			ba = None
+		if pb2[0]-pb1[0] != 0:
+			mb = (pb2[1]-pb1[1])/(pb2[0]-pb1[0])
+		else:
+			mb = None
+			bb = None
+
+		# calculate y-intercept
+		if ma != None:
+			ba = pa1[1] - ma*pa1[0]
+		if mb != None:
+			bb = pb1[1] - mb*pb1[0]
+
+		if ma == None: # la is vertical
+			if mb == None: # both lines vertical
+				if abs(pa1[0] - pb1[0]) > thresh: return False # can only intersect if they are on top of each other
+				return atop <= btop <= abot or atop <= bbot <= abot
+			else:
+				yb = mb * pa1[0] + bb
+				return atop <= yb <= abot and (aleft <= bleft <= aright or aleft <= bright <= aright)
+		elif mb == None:
+			ya = ma * pb1[0] + ba
+			return btop < ya < bbot
+		else: # normal testing
+			if ma == mb: # darnit already there are so many edge-cases! This is if they both have the same slope.
+				return (aleft <= bleft <= aright or aleft <= bright <= aright) and (atop <= btop <= abot or
+						atop <= bbot <= abot)
+			px = (bb - ba)/(ma-mb)
+
+			# set py to the f= of the more accurate formula (lower slope)
+			if abs(ma) < abs(mb):
+				py = ma * px + ba
+			else:
+				py = mb * px + bb
+
+			if abs(py - ma * px - ba) > thresh or abs(py - mb * px - bb) > thresh: return False
+			if aleft <= px <= aright and atop <= py <= abot and bleft <= px <= bright and btop <= py <= bbot:
+				return True
+		return False
+		
 
 	def _crossed(self, other):
 		""" Returns true if the paths of these objects crossed in the last frame.
 			This should be used for fast-moving projectiles to make sure they
 			are not going through things. This is /not/ very precise. """
-		mlines = ( (self.last.centerx, self.last.centery, self.geom.centerx, self.geom.centery),
-			(self.geom.left, self.geom.top, self.geom.left, self.geom.bottom),
-			(self.geom.right, self.geom.top, self.geom.right, self.geom.bottom),
-			(self.geom.left, self.geom.top, self.geom.right, self.geom.top),
-			(self.geom.left, self.geom.bottom, self.geom.right, self.geom.bottom) )
 
-		olines = (  (other.last.centerx, other.last.centery, other.geom.centerx, other.geom.centery),
-			(other.geom.left, other.geom.top, other.geom.left, other.geom.bottom),
-			(other.geom.right, other.geom.top, other.geom.right, other.geom.bottom),
-			(other.geom.left, other.geom.top, other.geom.right, other.geom.top),
-			(other.geom.left, other.geom.bottom, other.geom.right, other.geom.bottom) )
+		mlines = ( (self.last.centerx, self.last.centery, self.geom.centerx, self.geom.centery), # 0 - path line
+			(self.geom.left, self.geom.top, self.geom.left, self.geom.bottom), # 1 - left line
+			(self.geom.right, self.geom.top, self.geom.right, self.geom.bottom), # 2 - right line
+			(self.geom.left, self.geom.top, self.geom.right, self.geom.top), # 3 - top line
+			(self.geom.left, self.geom.bottom, self.geom.right, self.geom.bottom) ) # 4 - bottom line
+
+		olines = (  (other.last.centerx, other.last.centery, other.geom.centerx, other.geom.centery), # 0 - path
+			(other.geom.left, other.geom.top, other.geom.left, other.geom.bottom), # 1 - left
+			(other.geom.right, other.geom.top, other.geom.right, other.geom.bottom), # 2 - right
+			(other.geom.left, other.geom.top, other.geom.right, other.geom.top), # 3 - top
+			(other.geom.left, other.geom.bottom, other.geom.right, other.geom.bottom) ) # 4 - bottom
 		for m in mlines:
 			for o in olines:
-				if physics.linesIntersect(self._reline(o), self._reline(m)):
+				if self._lint(m, o):
+					print mlines.index(m), "with", olines.index(o)
 					return True
 		return False
 
@@ -91,7 +149,8 @@ class Entity:
 				mrect = (self.geom.centerx - m.get_width()/2, self.geom.centery - m.get_height()/2)
 				artist.drawImage(m, mrect)
 				artist.addDirtyRect((mrect[0], mrect[1], m.get_width(), m.get_height()))
-			
+		
+		artist.drawRect(self.last.topleft, self.last.size)
 
 		artist.addDirtyRect(self.geom)
 		artist.addDirtyRect(self.last)
@@ -101,8 +160,10 @@ class Entity:
 			self.anim.update(time)
 
 	def updatelast(self):
-		self.last.left = self.geom.left
-		self.last.top = self.geom.top
+		self.last.x = self.geom.x
+		self.last.y = self.geom.y
+		self.last.width = self.geom.width
+		self.last.height = self.geom.height
 
 	def update(self, time):
 		self.updatelast()
@@ -220,7 +281,6 @@ class Block(FloorBlock):
 		elif wbelow and not below or not (abs(other.geom.bottom - self.geom.top) < abs(self.geom.bottom - other.geom.top)):
 			other.geom.top = self.geom.bottom
 			other.vely = self.vely
-			other.updatelast()
 		else:
 			if not above:
 				other.geom.bottom = self.geom.top
