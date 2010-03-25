@@ -105,18 +105,17 @@ def main():
 						t12.player.jump()
 				elif event.key == pygame.K_c:
 					t12.player.geom.center = (200, 100)
+					t12.player.velx, t12.player.vely = 0, 0
 				elif event.key == pygame.K_m:
 					manrise = 0
 				elif event.key == pygame.K_w:
-					manrise = -1
-					for a in croom.geometry:
-						if a.geom.height < 50:
-							a.vely = -500
+					t12.player.geom.y -= 100
 				elif event.key == pygame.K_s:
-					manrise = 1
-					for a in croom.geometry:
-						if a.geom.height < 50:
-							a.vely = 500
+					t12.player.geom.y += 100
+				elif event.key == pygame.K_a:
+					t12.player.velx = -100000
+				elif event.key == pygame.K_d:
+					t12.player.geom.x += 100
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
 					t12.player.velx = 0
