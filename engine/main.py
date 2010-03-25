@@ -115,7 +115,7 @@ def main():
 				elif event.key == pygame.K_a:
 					t12.player.velx = -100000
 				elif event.key == pygame.K_d:
-					t12.player.geom.x += 100
+					t12.player.velx =  100000
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
 					t12.player.velx = 0

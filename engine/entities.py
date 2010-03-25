@@ -90,9 +90,12 @@ class Entity:
 				if abs(pa1[0] - pb1[0]) > thresh: return False # can only intersect if they are on top of each other
 				return atop <= btop <= abot or atop <= bbot <= abot
 			else:
+				if bleft <= aleft <= bright and atop <= btop <= abot and atop <= bbot <= abot:
+					return True
 				yb = mb * pa1[0] + bb
 				return atop <= yb <= abot and (aleft <= bleft <= aright or aleft <= bright <= aright)
 		elif mb == None:
+			if aleft <= bleft <= aright and btop <= atop <= bbot and btop <= abot <= bbot: return True
 			ya = ma * pb1[0] + ba
 			return btop < ya < bbot
 		else: # normal testing
@@ -107,7 +110,7 @@ class Entity:
 			else:
 				py = mb * px + bb
 
-			if abs(py - ma * px - ba) > thresh or abs(py - mb * px - bb) > thresh: return False
+			#if abs(py - ma * px - ba) > thresh or abs(py - mb * px - bb) > thresh: return False
 			if aleft <= px <= aright and atop <= py <= abot and bleft <= px <= bright and btop <= py <= bbot:
 				return True
 		return False
@@ -122,13 +125,23 @@ class Entity:
 			(self.geom.left, self.geom.top, self.geom.left, self.geom.bottom), # 1 - left line
 			(self.geom.right, self.geom.top, self.geom.right, self.geom.bottom), # 2 - right line
 			(self.geom.left, self.geom.top, self.geom.right, self.geom.top), # 3 - top line
-			(self.geom.left, self.geom.bottom, self.geom.right, self.geom.bottom) ) # 4 - bottom line
+			(self.geom.left, self.geom.bottom, self.geom.right, self.geom.bottom), # 4 - bottom line
+			(self.last.left, self.last.top, self.geom.left, self.geom.top),
+			(self.last.right, self.last.top, self.geom.right, self.geom.top),
+			(self.last.left, self.last.bottom, self.geom.left, self.geom.bottom),
+			(self.last.right, self.last.bottom, self.geom.right, self.geom.bottom)
+			)
 
 		olines = (  (other.last.centerx, other.last.centery, other.geom.centerx, other.geom.centery), # 0 - path
 			(other.geom.left, other.geom.top, other.geom.left, other.geom.bottom), # 1 - left
 			(other.geom.right, other.geom.top, other.geom.right, other.geom.bottom), # 2 - right
 			(other.geom.left, other.geom.top, other.geom.right, other.geom.top), # 3 - top
-			(other.geom.left, other.geom.bottom, other.geom.right, other.geom.bottom) ) # 4 - bottom
+			(other.geom.left, other.geom.bottom, other.geom.right, other.geom.bottom), # 4 - bottom
+			(other.last.left, other.last.top, other.geom.left, other.geom.top),
+			(other.last.right, other.last.top, other.geom.right, other.geom.top),
+			(other.last.left, other.last.bottom, other.geom.left, other.geom.bottom),
+			(other.last.right, other.last.bottom, other.geom.right, other.geom.bottom)
+			)
 		for m in mlines:
 			for o in olines:
 				if self._lint(m, o):
@@ -282,7 +295,7 @@ class Block(FloorBlock):
 			other.geom.top = self.geom.bottom
 			other.vely = self.vely
 		else:
-			if not above:
+			if not above: 
 				other.geom.bottom = self.geom.top
 				other.grounded = True
 				if other.vely > 0:
