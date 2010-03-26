@@ -64,7 +64,7 @@ def main():
 
 	t12.player = entities.Actor((420.0, 100.0, 30.0, 20.0), an)
 	t12.player.name = "player"
-	t12.player.jumpheight = 72 # wikianswers says this number should be 72, but that is boring.
+	t12.player.jumpheight = 250 # wikianswers says this number should be 72, but that is boring.
 	t12.player.speed = 396 # 396 in/2s according to wikianswers
 
 	t12.player.adjustGeomToImage()
@@ -170,6 +170,16 @@ def main():
 		elif t12.player.geom.bottom > hig:
 			hd = t12.player.geom.bottom - hig + 50 
 
+		# The following rant describes the next two lines of actual code.
+		# Both of these are divided by 5 because in my experience the number 5 works pretty well.
+		# What the /5 means is that the time remaining until the camera is where it should be
+		# has a "fifth-life" of 1/5. This is just like the half-life of unstable particles (except 1/5th instead of 1/2).
+		# So at each frame 1/5 of the remaining distance is covered. Because of this it decelerates nicely as it approaches
+		# its goal, and eventually the distance is smaller than an integer value and is rounded off. A sequence of distances,
+		# over a period of frames, might look like this: 125, 25, 5, 1, 0.2... and 0.2 is rounded to 0 so it stops.
+		# It is entirely possible to replace this simple /5 with a slightly more sophisticated approach that would always
+		# reach its destination in a predermined time interval. Feel free to implement this if you dislike my magic numbers.
+		# Personally, I think it's just fine how it is now.
 		xinc = abs(artist.offsetx+wd)/5
 		yinc = abs(artist.offsety+hd)/5
 
@@ -196,8 +206,6 @@ def main():
 		for e in croom.art_over:
 			e.updateArt(seconds)
 			e.draw(artist)
-		#t12.player.updateArt(seconds)
-		#t12.player.draw(artist)
 
 		pygame.display.update(last_drects)
 		pygame.display.update(drects)

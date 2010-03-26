@@ -269,7 +269,21 @@ class Block(FloorBlock):
 			if self.sticky or other.vely >= 0 and self.vely < other.vely:
 				other.vely = self.vely
 				other.geom.bottom = self.geom.top
+				if self.sticky and other.vely < 0:
+					other.vely = 0
 			return
+
+		"""
+		ontop = other.geom.bottom == self.geom.top
+		onbottom = other.geom.top == self.geom.bottom
+		onleft = other.geom.right == self.geom.left
+		onright = other.geom.left == self.geom.right
+
+		wontop = other.last.bottom == self.last.top
+		wonbottom = other.last.top == self.last.bottom
+		wonleft = other.last.right == self.last.left
+		wonright = other.last.left == self.last.right
+		"""
 
 		above = other.geom.bottom < self.geom.top
 		below = other.geom.top > self.geom.bottom
@@ -285,8 +299,10 @@ class Block(FloorBlock):
 			other.geom.bottom = self.geom.top
 			other.grounded = True
 			other.lastFloor = self
-			if self.sticky or other.vely >= 0 and self.vely < other.vely:
+			if self.sticky or (other.vely >= 0 and self.vely < other.vely):
 				other.vely, other.acy = self.vely, 0
+				if self.sticky and other.vely < 0:
+					other.vely = 0
 		elif wleft and not left:
 			other.geom.right = self.geom.left
 			other.velx = self.velx
@@ -296,13 +312,12 @@ class Block(FloorBlock):
 		elif wbelow and not below or not (abs(other.geom.bottom - self.geom.top) < abs(self.geom.bottom - other.geom.top)):
 			other.geom.top = self.geom.bottom
 			other.vely = self.vely
-		else:
-			if not above: 
-				other.geom.bottom = self.geom.top
-				other.grounded = True
-				other.lastFloor = self
-				if other.vely > 0:
-					other.vely, other.acy = self.vely, 0
+		elif not above:
+			other.geom.bottom = self.geom.top
+			other.grounded = True
+			other.lastFloor = self
+			if other.vely >= 0:
+				other.vely, other.acy = self.vely, 0
 
 class TriggerEntity(Entity):
 	def __init__(self, geom, anim):
@@ -397,6 +412,9 @@ class Elevator(Entity):
 				self.vely = 0
 				self.geom.y = self.y1
 				self.state = 0
+
+		self.floor.vely = self.vely
+		self.roof.vely = self.vely
 
 		self.floor.updatelast()
 		self.roof.updatelast()
