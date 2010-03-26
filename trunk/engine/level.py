@@ -110,8 +110,12 @@ def tload():
 		trig.anim.runSequence("unpressed")
 	def react3(par=None):
 		if t12.player != None:
-			t12.player.geom.bottom = fblock.geom.top-5
-			t12.player.geom.centerx = fblock.geom.centerx
+			if t12.player.lastFloor == None:
+				t12.player.geom.bottom = fblock.geom.top-5
+				t12.player.geom.centerx = fblock.geom.centerx
+			else:
+				t12.player.geom.centerx, t12.player.geom.bottom = t12.player.lastFloor.geom.centerx, t12.player.lastFloor.geom.top
+				t12.player.updatelast()
 	trig.reactors.append(reactor)
 	trig2.reactors.append(reactor2)
 	trig3.reactors.append(react3)
@@ -124,9 +128,13 @@ def tload():
 	elevator = entities.Elevator((600, 200, 150, 200), 100, 0.5)
 	troom.add(elevator)
 
-	longblock1 = entities.Block((1000, 380, 100, 20), None)
-	longblock2 = entities.Block((1200, 350, 100, 20), None)
-	troom.add(longblock1)
-	troom.add(longblock2)
+	for i in range(20):
+		# xpos calculation
+		if i < 8:
+			blah = 1000 + 200*i
+		else:
+			blah = 1000 + 200*7 - 200*(i-6)
+		b = entities.Block((blah, 380-30*i, 100, 20), None)
+		troom.add(b)
 
 tlevel.load = tload

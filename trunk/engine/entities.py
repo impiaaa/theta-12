@@ -225,6 +225,7 @@ class Entity:
 
 class FloorBlock(Entity):
 	def __init__(self, geom, anim):
+		""" Use Block instead of FloorBlock, please. """
 		Entity.__init__(self, geom, anim)
 		self.attributes.append("geometry")
 		self.attributes.append("art_mid")
@@ -264,6 +265,7 @@ class Block(FloorBlock):
 	def _collision(self, other):
 		if other.geom.bottom < self.geom.top:
 			other.grounded = True
+			other.lastFloor = self
 			if self.sticky or other.vely >= 0 and self.vely < other.vely:
 				other.vely = self.vely
 				other.geom.bottom = self.geom.top
@@ -282,6 +284,7 @@ class Block(FloorBlock):
 		if wabove:
 			other.geom.bottom = self.geom.top
 			other.grounded = True
+			other.lastFloor = self
 			if self.sticky or other.vely >= 0 and self.vely < other.vely:
 				other.vely, other.acy = self.vely, 0
 		elif wleft and not left:
@@ -297,6 +300,7 @@ class Block(FloorBlock):
 			if not above: 
 				other.geom.bottom = self.geom.top
 				other.grounded = True
+				other.lastFloor = self
 				if other.vely > 0:
 					other.vely, other.acy = self.vely, 0
 
@@ -417,7 +421,7 @@ class Actor(Entity):
 		self.health = 10 # arbitrary default
 		self.jumpheight = 50 # arbitrary
 		self.speed = 100 # horizontal movement speed. may be replaced by acceleration at some point.
-
+		self.lastFloor = None # the last entity I stood on
 		self.update(0) # for the feetbox
 
 	def update(self, time):
