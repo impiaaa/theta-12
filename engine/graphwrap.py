@@ -48,8 +48,6 @@ class AnimSprite:
 			self.current_seq = t12.anim_sequences[seq].clone()
 		elif isinstance(seq, str):
 			if self.sequences.has_key(seq):
-				if self.current_seq is not None:
-					print "running", seq, (self.current_seq.currentImage() is not self.sequences[seq].currentImage())
 				self.current_seq = self.sequences[seq]
 		else:
 			self.current_seq = seq.clone()
