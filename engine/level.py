@@ -73,20 +73,20 @@ tlevel = Level()
 
 def tload():
 	troom = tlevel.croom
-	trig = entities.MotionTrigger((200, 350, 50, 50),
-			graphwrap.staticSprite(t12.imageLoader.getImage("global/sprites/button.png"))) # this trigger has its .anim set to None, 
+
+	button_anim = graphwrap.AnimSprite()
+	button_anim.putSequence("unpressed", graphwrap.staticSequence(t12.imageLoader.getImage("global/sprites/button.png")))
+	button_anim.putSequence("pressed", graphwrap.staticSequence(t12.imageLoader.getImage("global/sprites/button-pressed.png")))
+	button_anim.runSequence("unpressed")
+
+	trig = entities.Activator((200, 350, 50, 50), button_anim) # this trigger has its .anim set to None, 
 															# but most motion triggers will probably be invisible (-1)
-	trig2 = entities.MotionTrigger((325, 350, 50, 50),
-			graphwrap.staticSprite(t12.imageLoader.getImage("global/sprites/button-pressed.png")))
+	trig2 = entities.Activator((325, 350, 50, 50), button_anim)
 	trig3 = entities.MotionTrigger((-1000, 1000, 30000, 100), -1)
 
 	trig.adjustGeomToImage()
 	trig2.adjustGeomToImage()
 	trig.geom.bottom, trig2.geom.bottom = 400, 400
-
-	trig.attributes.append("geometry")
-	trig2.attributes.append("geometry")
-	trig3.attributes.append("geometry")
 
 	troom.add(trig)
 	troom.add(trig2)
@@ -101,9 +101,13 @@ def tload():
 	
 	fblock = entities.Block((300, 200, 50, 50), graphwrap.staticSprite(t12.imageLoader.getImage("global/sprites/box.png")))
 	def reactor(par=None):
-		fblock.geom.topleft = (200, 200)
+		fblock.geom.centerx = trig.geom.centerx
+		trig.anim.runSequence("pressed")
+		trig2.anim.runSequence("unpressed")
 	def reactor2(par=None):
-		fblock.geom.topleft = (300, 200)
+		fblock.geom.centerx = trig2.geom.centerx
+		trig2.anim.runSequence("pressed")
+		trig.anim.runSequence("unpressed")
 	def react3(par=None):
 		if t12.player != None:
 			t12.player.geom.bottom = fblock.geom.top-5
@@ -119,5 +123,10 @@ def tload():
 	
 	elevator = entities.Elevator((600, 200, 150, 200), 100, 0.5)
 	troom.add(elevator)
+
+	longblock1 = entities.Block((1000, 380, 100, 20), None)
+	longblock2 = entities.Block((1200, 350, 100, 20), None)
+	troom.add(longblock1)
+	troom.add(longblock2)
 
 tlevel.load = tload

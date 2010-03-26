@@ -20,6 +20,8 @@ class Entity:
 			self.geom = pygame.rect.Rect(geom) # convert to pygame.rect.Rect
 		self.last = pygame.rect.Rect((self.geom.left, self.geom.top, self.geom.width, self.geom.height))
 		self.anim = anim # AnimSprite
+		if self.anim != None and self.anim != -1:
+			self.anim = self.anim.clone() # without this, really strange stuff will occur
 		self.velx, self.vely = 0, 0
 		self.move_allowed = True # flag set to false if collision is imminent
 		self.acx, self.acy = 0, 0 # constant acceleration (use acy for gravity)
@@ -93,11 +95,11 @@ class Entity:
 				if bleft <= aleft <= bright and atop <= btop <= abot and atop <= bbot <= abot:
 					return True
 				yb = mb * pa1[0] + bb
-				return atop <= yb <= abot and (aleft <= bleft <= aright or aleft <= bright <= aright)
+				return atop <= yb <= abot and btop <= yb <= bbot
 		elif mb == None:
 			if aleft <= bleft <= aright and btop <= atop <= bbot and btop <= abot <= bbot: return True
 			ya = ma * pb1[0] + ba
-			return btop < ya < bbot
+			return btop <= ya <= bbot and atop <= ya <= abot
 		else: # normal testing
 			if ma == mb: # darnit already there are so many edge-cases! This is if they both have the same slope.
 				return (aleft <= bleft <= aright or aleft <= bright <= aright) and (atop <= btop <= abot or
@@ -145,7 +147,6 @@ class Entity:
 		for m in mlines:
 			for o in olines:
 				if self._lint(m, o):
-					print mlines.index(m), "with", olines.index(o)
 					return True
 		return False
 
@@ -154,7 +155,7 @@ class Entity:
 			artist.drawRect(self.geom.topleft, self.geom.size)
 		elif self.anim == -1:
 			return
-		else:
+		elif self.anim.getImage() != None:
 			m = self.anim.getImage()
 			if self.stretchArt:
 				artist.drawImage(m, self.geom.topleft, self.geom.size)
@@ -163,8 +164,6 @@ class Entity:
 				artist.drawImage(m, mrect)
 				artist.addDirtyRect((mrect[0], mrect[1], m.get_width(), m.get_height()))
 		
-		artist.drawRect(self.last.topleft, self.last.size)
-
 		artist.addDirtyRect(self.geom)
 		artist.addDirtyRect(self.last)
 
@@ -315,9 +314,16 @@ class TriggerEntity(Entity):
 		for r in self.reactors:
 			r(par)
 
+class Activator(TriggerEntity):
+	def __init__(self, geom, anim):
+		TriggerEntity.__init__(self, geom, anim)
+		self.attributes.append("activators")
+	
+
 class MotionTrigger(TriggerEntity):
 	def __init__(self, geom, anim):
 		TriggerEntity.__init__(self, geom, anim)
+		self.attributes.append("geometry")
 
 	def _collision(self, other):
 		if other.name == "player":
