@@ -31,6 +31,7 @@ class AnimSprite:
 		# define self.current_sequence
 		self.sequences = {}
 		self.current_seq = None
+		self.current_image = None
 
 	def update(self, time):
 		if self.current_seq is not None:
@@ -41,10 +42,14 @@ class AnimSprite:
 
 	def runSequence(self, seq):
 		""" The paramater can be either a sequence id or an AnimSequence object. """
+		if seq == None: return
+
 		if isinstance(seq, int):
 			self.current_seq = t12.anim_sequences[seq].clone()
 		elif isinstance(seq, str):
 			if self.sequences.has_key(seq):
+				if self.current_seq is not None:
+					print "running", seq, (self.current_seq.currentImage() is not self.sequences[seq].currentImage())
 				self.current_seq = self.sequences[seq]
 		else:
 			self.current_seq = seq.clone()
@@ -53,6 +58,13 @@ class AnimSprite:
 
 	def getImage(self):
 		return self.current_image
+
+	def clone(self):
+		anim = AnimSprite()
+		for k in self.sequences:
+			anim.putSequence(k, self.sequences[k].clone())
+		anim.runSequence(self.current_seq)
+		return anim
 
 
 class AnimSequence:
@@ -182,6 +194,7 @@ class Artist:
 			self.drawLine(l)
 
 	def drawImage(self, image, pos, dim=None):
+		if image == None: return
 		if dim != None:
 			image = pygame.transform.scale(image, dim)
 		pos = (pos[0] + self.offsetx, pos[1] + self.offsety)

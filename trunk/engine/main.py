@@ -50,11 +50,11 @@ def main():
 
 
 	#test code for loading velociraptor anim
-	seq = graphwrap.staticSequence(t12.imageLoader.getImage("global/sprites/Velociraptor2.png"))
-	seq2 = graphwrap.staticSequence(pygame.transform.flip(t12.imageLoader.getImage("global/sprites/Velociraptor2.png"), 1, 0))
 	an = graphwrap.AnimSprite()
-	an.putSequence("left", seq)
-	an.putSequence("right", seq2)
+	an.putSequence("left", graphwrap.staticSequence(
+						t12.imageLoader.getImage("global/sprites/Velociraptor2.png")))
+	an.putSequence("right", graphwrap.staticSequence(
+						pygame.transform.flip(t12.imageLoader.getImage("global/sprites/Velociraptor2.png"), 1, 0)))
 	an.runSequence("left")
 	
 	
@@ -64,7 +64,7 @@ def main():
 
 	t12.player = entities.Actor((420.0, 100.0, 30.0, 20.0), an)
 	t12.player.name = "player"
-	t12.player.jumpheight = 250 # wikianswers says this number should be 72, but that is boring.
+	t12.player.jumpheight = 72 # wikianswers says this number should be 72, but that is boring.
 	t12.player.speed = 396 # 396 in/2s according to wikianswers
 
 	t12.player.adjustGeomToImage()
@@ -79,6 +79,8 @@ def main():
 	seconds = 0
 	ctime = 0
 
+	activating = False # is the player pressing the activate button?
+
 	while 1:
 		ctime = time.time()
 		seconds = ctime - last_time
@@ -89,6 +91,7 @@ def main():
 
 		screen.blit(background, (0, 0))
 
+
 		# process events
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -96,13 +99,15 @@ def main():
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
 					t12.player.left()
-					an.runSequence("left")
+					t12.player.anim.runSequence("left")
 				elif event.key == pygame.K_RIGHT:
 					t12.player.right()
-					an.runSequence("right")
+					t12.player.anim.runSequence("right")
 				elif event.key == pygame.K_UP:
 					if t12.player.grounded:
 						t12.player.jump()
+				elif event.key == pygame.K_SPACE:
+					activating = True
 				elif event.key == pygame.K_c:
 					t12.player.geom.center = (200, 100)
 					t12.player.velx, t12.player.vely = 0, 0
@@ -117,8 +122,12 @@ def main():
 				elif event.key == pygame.K_d:
 					t12.player.velx =  100000
 			if event.type == pygame.KEYUP:
-				if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+				if event.key == pygame.K_LEFT and t12.player.velx < 0:
 					t12.player.velx = 0
+				elif event.key == pygame.K_RIGHT and t12.player.velx > 0:
+					t12.player.velx = 0
+				elif event.key == pygame.K_SPACE:
+					activating = False
 
 
 		# update movement/spawn things
@@ -132,10 +141,21 @@ def main():
 				
 		# detect collisions
 		for a in croom.geometry:
-			if a is t12.player: continue
+			for b in croom.actors:
+				if a is b: continue # this really should never happen
+				if a.intersects(b):
+					a.collision(b)
 
+		for a in croom.touch_player:
+			if a is t12.player: continue # this really should never happen
 			if a.intersects(t12.player):
 				a.collision(t12.player)
+
+		if activating:
+			for a in croom.activators:
+				if a is t12.player: continue # this really should never happen
+				if a.intersects(t12.player):
+					a.trigger()
 
 		if not t12.player.grounded:
 			t12.player.acy = t12.gravity
