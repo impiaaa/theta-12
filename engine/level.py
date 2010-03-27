@@ -17,6 +17,7 @@ class Room:
 		self.activators = [] # entities that do something when the player comes near them or clicks them or something (like buttons or traps)
 		self.geometry = [] # objects everything can collide with
 		self.actors = []
+		self.touch_geom = [] # things that collide with geometry
 
 		# these groups are used for layering the graphics.
 		# general guidlines for what to put where:
@@ -25,6 +26,25 @@ class Room:
 		# front - npcs
 		# over - explosions and particle effects and such
 		self.art_back, self.art_mid, self.art_front, self.art_over = [], [], [], []
+		self.playerstart = (320, 240) # this probably should left as default, but should be defined in the level editor.
+
+	def _removeFrom(self, entity, entities):
+		while entities.count(entity) > 0: entities.remove(entity)
+
+	def remove(self, entity):
+		""" Removes this entity from all lists where it is found. """
+		self._removeFrom(entity, self.all)
+		self._removeFrom(entity, self.background)
+		self._removeFrom(entity, self.geometry)
+		self._removeFrom(entity, self.touch_geom)
+		self._removeFrom(entity, self.touch_player)
+		self._removeFrom(entity, self.touch_enemies)
+		self._removeFrom(entity, self.activators)
+		self._removeFrom(entity, self.actors)
+		self._removeFrom(entity, self.art_back)
+		self._removeFrom(entity, self.art_front)
+		self._removeFrom(entity, self.art_over)
+		self._removeFrom(entity, self.art_mid)
 
 	def add(self, entity):
 		""" Adds the entity to the appropriate lists based on its attributes """
@@ -41,6 +61,8 @@ class Room:
 			self.geometry.append(entity)
 		if entity.attributes.count("actor") >= 1 or entity.attributes.count("actors") >= 1:
 			self.actors.append(entity)
+		if entity.attributes.count("touch_geom") >= 1:
+			self.touch_geom.append(entity)
 
 		if entity.attributes.count("art_back") >= 1:
 			self.art_back.append(entity)
@@ -83,10 +105,22 @@ def tload():
 															# but most motion triggers will probably be invisible (-1)
 	trig2 = entities.Activator((325, 350, 50, 50), button_anim)
 	trig3 = entities.MotionTrigger((-1000, 1000, 30000, 100), -1)
+	trig3.name = "Steve"
 
 	trig.adjustGeomToImage()
 	trig2.adjustGeomToImage()
 	trig.geom.bottom, trig2.geom.bottom = 400, 400
+
+	projTrig = entities.Activator((0, 350, 50, 50), None)
+	def conjureMeat(par=None):
+		meat = entities.DamageProjectile((0, 0, 1, 1),
+			 graphwrap.staticSprite(t12.imageLoader.getImage("global/sprites/animal_meat.png")), 90, 500, 1)
+		meat.adjustGeomToImage()
+		meat.geom.center = (projTrig.geom.centerx, projTrig.geom.top - 300)
+		meat.attributes.append("touch_player")
+		projTrig.spawn.append(meat)
+	projTrig.reactors.append(conjureMeat)
+	troom.add(projTrig)
 
 	troom.add(trig)
 	troom.add(trig2)
@@ -95,11 +129,13 @@ def tload():
 	for i in range(24):
 		tblock = entities.Block((50*i, 400, 50, 20), None)
 		tblock.attributes.append("geometry")
+		tblock.name = str(i)
 		if i % 2 == 0:
 			tblock.sticky = True
 		troom.add(tblock)
 	
 	fblock = entities.Block((300, 200, 50, 50), graphwrap.staticSprite(t12.imageLoader.getImage("global/sprites/box.png")))
+	fblock.name = "Block"
 	def reactor(par=None):
 		fblock.geom.centerx = trig.geom.centerx
 		trig.anim.runSequence("pressed")
@@ -123,6 +159,7 @@ def tload():
 	troom.add(fblock)
 
 	wall = entities.Block((100, 200, 50, 200), None)
+	wall.name = "Joe"
 	troom.add(wall)
 	
 	elevator = entities.Elevator((600, 200, 150, 200), 100, 0.5)
@@ -135,6 +172,7 @@ def tload():
 		else:
 			blah = 1000 + 200*7 - 200*(i-6)
 		b = entities.Block((blah, 380-30*i, 100, 20), None)
+		b.name = "Step " + str(i)
 		troom.add(b)
 
 tlevel.load = tload

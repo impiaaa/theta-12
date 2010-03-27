@@ -72,6 +72,7 @@ def main():
 	t12.player.geom.width = 20 # testing things
 
 	croom.add(t12.player)
+	t12.player.geom.center = croom.playerstart
 	
 
 	firstframe = True
@@ -134,6 +135,9 @@ def main():
 
 		# update movement/spawn things
 		for e in croom.all:
+			if e.flagForRemoval:
+				croom.remove(e)
+				continue
 			e.update(seconds)
 			if len(e.spawn) > 0:
 				for s in e.spawn:
@@ -143,7 +147,7 @@ def main():
 				
 		# detect collisions
 		for a in croom.geometry:
-			for b in croom.actors:
+			for b in croom.touch_geom:
 				if a is b: continue # this really should never happen
 				if a.intersects(b):
 					a.collision(b)
@@ -157,7 +161,7 @@ def main():
 			for a in croom.activators:
 				if a is t12.player: continue # this really should never happen
 				if a.intersects(t12.player):
-					a.trigger()
+					a.activate()
 
 		if not t12.player.grounded:
 			t12.player.acy = t12.gravity
