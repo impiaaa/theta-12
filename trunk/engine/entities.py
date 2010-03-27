@@ -39,6 +39,34 @@ class Entity:
 		self.stretchArt = True # stretch the art to fill the geometry, or center the art if the sizes aren't the same?
 
 		self.collidedWith = [] # list of things I collided with this frame
+		self.artAngle = 0
+		self.flagForRemoval = False
+
+	def closest(self, ents):
+		""" returns the entity which is closest to me """
+		shortestDist = 0
+		closestEnt = None
+		for e in ents:
+			xd = math.min(e.geom.right - self.geom.left, self.geom.right - e.geom.left)
+			yd = math.min(e.geom.bottom - self.geom.top, self.geom.bottom - e.geom.top)
+			dist = math.sqrt(xd**2 + yd**2)
+			if closestEnt == None or dist < shortestDist:
+				shortestDist = dist
+				closestEnt = e
+		return closestEnd
+
+	def was_closest(self, ents):
+		""" returns the entity which was closest to me at the last frame """
+		shortestDist = 0
+		closestEnt = None
+		for e in ents:
+			xd = math.min(e.last.right - self.last.left, self.last.right - e.last.left)
+			yd = math.min(e.last.bottom - self.last.top, self.last.bottom - e.last.top)
+			dist = math.sqrt(xd**2 + yd**2)
+			if closestEnt == None or dist < shortestDist:
+				shortestDist = dist
+				closestEnt = e
+		return closestEnd
 		
 	def adjustGeomToImage(self):
 		if self.anim == None or self.anim == -1: return
@@ -158,11 +186,14 @@ class Entity:
 		elif self.anim.getImage() != None:
 			m = self.anim.getImage()
 			if self.stretchArt:
-				artist.drawImage(m, self.geom.topleft, self.geom.size)
+				z = artist.drawImage(m, self.geom.topleft, self.geom.size, self.artAngle)
+				rect = (self.geom.left, self.geom.top, z.get_width(), z.get_height())
+				artist.addDirtyRect(rect)
 			else:
 				mrect = (self.geom.centerx - m.get_width()/2, self.geom.centery - m.get_height()/2)
-				artist.drawImage(m, mrect)
-				artist.addDirtyRect((mrect[0], mrect[1], m.get_width(), m.get_height()))
+				z = artist.drawImage(image=m, pos=mrect, angle=self.artAngle)
+				rect = (mrect[0], mrect[1], z.get_width(), z.get_height())
+				artist.addDirtyRect(rect)
 		
 		artist.addDirtyRect(self.geom)
 		artist.addDirtyRect(self.last)
@@ -214,9 +245,12 @@ class Entity:
 		if other is self: return
 		# things cannot hit each other more than once in a frame!
 		if self.collidedWith.count(other) >= 1: return
+		if other.collidedWith.count(self) >= 1: return
 		self.collidedWith.append(other)
+		other.collidedWith.append(self)
 		# call the code that actually does something with the collision
 		self._collision(other)
+		other._collision(self)
 
 	def _collision(self, other):
 		""" This method is called when this entity hits another entity.
@@ -337,6 +371,21 @@ class Activator(TriggerEntity):
 	def __init__(self, geom, anim):
 		TriggerEntity.__init__(self, geom, anim)
 		self.attributes.append("activators")
+		self.activated = False
+		self.allowActivation = True
+
+	def update(self, time):
+		TriggerEntity.update(self, time)
+		if self.activated:
+			self.allowActivation = False
+		else:
+			self.allowActivation = True
+		self.activated = False
+
+	def activate(self, par=None):
+		self.activated = True
+		if self.allowActivation:
+			self.trigger(par)
 	
 
 class MotionTrigger(TriggerEntity):
@@ -435,6 +484,7 @@ class Actor(Entity):
 
 		self.attributes.append("actors")
 		self.attributes.append("art_front")
+		self.attributes.append("touch_geom")
 
 		self.health = 10 # arbitrary default
 		self.jumpheight = 50 # arbitrary
@@ -475,3 +525,31 @@ class Actor(Entity):
 		elif self.vely != 0:
 			sign = abs(self.vely)/self.vely
 			self.vely -= sign * y
+
+class Projectile(Entity):
+	def __init__(self, geom, anim, angle, magnitude):
+		Entity.__init__(self, geom, anim)
+		self.velx = magnitude * math.cos(math.radians(angle))
+		self.vely = magnitude * math.sin(math.radians(angle))
+		self.artAngle = angle
+		self.attributes.append("touch_geom")
+
+	def _collision(self, other):
+		if other.attributes.count("geometry") > 0 or isinstance(other, Actor):
+			self.anim.runSequence("hit")
+			self.flagForRemoval = True
+			return True
+		return False
+
+class DamageProjectile(Projectile):
+	def __init__(self, geom, anim, angle, magnitude, damage):
+		Projectile.__init__(self, geom, anim, angle, magnitude)
+		self.damage = damage
+
+	def _collision(self, other):
+		if not Projectile._collision(self, other): return
+		if isinstance(other, Actor):
+			other.health -= self.damage
+			print other.name, "is pwned! He now only has", other.health, "health!"
+		else:
+			print "Aww, I hit a wall", other.name

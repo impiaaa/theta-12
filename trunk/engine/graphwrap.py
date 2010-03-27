@@ -191,9 +191,12 @@ class Artist:
 		for l in lines:
 			self.drawLine(l)
 
-	def drawImage(self, image, pos, dim=None):
+	def drawImage(self, image, pos, dim=None, angle=None):
 		if image == None: return
 		if dim != None:
 			image = pygame.transform.scale(image, dim)
+		if angle != None:
+			image = pygame.transform.rotate(image, angle)
 		pos = (pos[0] + self.offsetx, pos[1] + self.offsety)
 		self.screen.blit(image, pos)
+		return image
