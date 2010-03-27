@@ -64,7 +64,7 @@ def main():
 
 	t12.player = entities.Actor((420.0, 100.0, 30.0, 20.0), an)
 	t12.player.name = "player"
-	t12.player.jumpheight = 250 # wikianswers says this number should be 72, but that is boring.
+	t12.player.jumpheight = 72 # wikianswers says this number should be 72, but that is boring.
 	t12.player.speed = 396 # 396 in/2s according to wikianswers
 
 	t12.player.adjustGeomToImage()
@@ -121,6 +121,8 @@ def main():
 					t12.player.velx = -100000
 				elif event.key == pygame.K_d:
 					t12.player.velx =  100000
+				elif event.key == pygame.K_p:
+					t12.camy = t12.player.geom.centery - screen.get_height()/2
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT and t12.player.velx < 0:
 					t12.player.velx = 0
@@ -164,11 +166,11 @@ def main():
 
 		wid, hig = screen.get_size()
 		wd = t12.player.geom.centerx - wid/2
-		hd = 0
-		if t12.player.geom.top < 0:
-			hd = t12.player.geom.top - 50
-		elif t12.player.geom.bottom > hig:
-			hd = t12.player.geom.bottom - hig + 50 
+		hd = t12.camy
+		if t12.player.geom.top - t12.camy < 50:
+			hd = t12.player.geom.top - 100
+		elif t12.player.geom.bottom - t12.camy > hig - 50:
+			hd = t12.player.geom.bottom - hig + 100 
 
 		# The following rant describes the next two lines of actual code.
 		# Both of these are divided by 5 because in my experience the number 5 works pretty well.
