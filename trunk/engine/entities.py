@@ -51,6 +51,12 @@ class Entity:
 		for e in ents:
 			xd = math.min(e.geom.right - self.geom.left, self.geom.right - e.geom.left)
 			yd = math.min(e.geom.bottom - self.geom.top, self.geom.bottom - e.geom.top)
+			if (self.geomtop < self.geomtop < self.geombottom or self.geomtop < self.geombottom < self.geombottom) or (
+				e.geomtop < self.geomtop < e.geombottom or e.geomtop < self.geombottom < e.geombottom):
+				yd = 0
+			if (self.geomleft < self.geomleft < self.geomright or self.geomleft < self.geomright < self.geomright) or (
+				e.geomleft < self.geomleft < e.geomright or e.geomleft < self.geomright < e.geomright):
+				xd = 0
 			dist = math.sqrt(xd**2 + yd**2)
 			if closestEnt == None or dist < shortestDist:
 				shortestDist = dist
@@ -64,6 +70,12 @@ class Entity:
 		for e in ents:
 			xd = min(e.last.right - self.last.left, self.last.right - e.last.left)
 			yd = min(e.last.bottom - self.last.top, self.last.bottom - e.last.top)
+			if (self.last.top < self.last.top < self.last.bottom or self.last.top < self.last.bottom < self.last.bottom) or (
+				e.last.top < self.last.top < e.last.bottom or e.last.top < self.last.bottom < e.last.bottom):
+				yd = 0
+			if (self.last.left < self.last.left < self.last.right or self.last.left < self.last.right < self.last.right) or (
+				e.last.left < self.last.left < e.last.right or e.last.left < self.last.right < e.last.right):
+				xd = 0
 			dist = math.sqrt(xd**2 + yd**2)
 			if closestEnt == None or dist < shortestDist:
 				shortestDist = dist
@@ -122,7 +134,7 @@ class Entity:
 		if ma == None: # la is vertical
 			if mb == None: # both lines vertical
 				if abs(pa1[0] - pb1[0]) > thresh: return False # can only intersect if they are on top of each other
-				return (atop <= btop <= abot or atop <= bbot <= abot) and pa[0] == pb[0]
+				return (atop <= btop <= abot or atop <= bbot <= abot) and pa1[0] == pb1[0]
 			else:
 				if bleft <= aleft <= bright and atop <= btop <= abot and atop <= bbot <= abot:
 					return True
@@ -149,11 +161,39 @@ class Entity:
 				return True
 		return False
 		
+	def _between(self, a, b, c):
+		""" tests is c is between a and b """
+		return a < c < b or a > c > b
+
+	def _inpath(self, other):
+		""" Returns true if the other entity is between my first and last positions. """
+		if (self._between(self.last.centerx, self.geom.centerx, other.last.centerx) or 
+				self._between(self.last.centerx, self.geom.centerx, other.geom.centerx)):
+			return True
+		if (self._between(self.last.centery, self.geom.centery, other.last.centery) or 
+				self._between(self.last.centery, self.geom.centery, other.geom.centery)):
+			return True
+		return False
 
 	def _crossed(self, other):
 		""" Returns true if the paths of these objects crossed in the last frame.
 			This should be used for fast-moving projectiles to make sure they
 			are not going through things. This is /not/ very precise. """
+
+		# let other=O, last=L, current=C
+		# O   L-----------C
+		# see, if O is way over there on the left, who cares about it?
+		if not self._inpath(other):
+			return False
+
+		# wow, how awesome! The line widths match up! Who knew that "top bottom" has the same number of characters as "left right"?!
+		if self.last.top >= other.last.bottom and self.geom.top >= other.geom.bottom: return False
+		if self.last.bottom <= other.last.top and self.geom.bottom <= other.geom.top: return False
+		if self.last.right <= other.last.left and self.geom.right <= other.geom.left: return False
+		if self.last.left >= other.last.right and self.geom.left >= other.geom.right: return False
+
+		# debug
+		print "you win,", other.name
 
 		mlines = ( (self.last.centerx, self.last.centery, self.geom.centerx, self.geom.centery), # 0 - path line
 			(self.geom.left+1, self.geom.top+1, self.geom.left+1, self.geom.bottom-1), # 1 - left line
@@ -419,6 +459,26 @@ class MotionTrigger(TriggerEntity):
 			TriggerEntity.trigger(self)
 
 class Elevator(Entity):
+
+	def _collisionF(self, other):
+		Block._collision(self.floor, other)
+		if other.name == "player" and self.state == 0 and self.playerref == None:
+			if self.geom.y == self.y1:
+				self.state = 1
+			else:
+				self.state = -1
+			
+			self.playerref = other
+	def _collisionR(self, other):
+		Block._collision(self.roof, other)
+		if other.name == "player" and self.state == 0 and self.playerref == None:
+			if self.geom.y == self.y1:
+				self.state = 1
+			else:
+				self.state = -1
+			
+			self.playerref = other
+
 	def __init__(self, geom, targety, duration):
 		""" Paramaters: geometry (rectangle),  targety (where the elevator will go), and duration (the 
 			time in seconds it will take to get there) """
@@ -427,6 +487,11 @@ class Elevator(Entity):
 		self.roof = Block((self.geom.left, self.geom.top, self.geom.width, 20), None)
 		self.floor.sticky = True
 		self.roof.sticky = True
+		self.roof.name = "Elevator Roof"
+		self.floor.name = "Elevator Floor"
+		self.name = "Elevator"
+		self.floor._collision = self._collisionF
+		self.roof._collision = self._collisionR
 		self.spawn.append(self.floor)
 		self.spawn.append(self.roof)
 		self.y1 = self.geom.top
@@ -438,10 +503,7 @@ class Elevator(Entity):
 		else:
 			self.dir = -1
 		self.speed = abs( (self.y2 - self.y1) / duration)
-		self.attributes.append("geometry") # this is in so it can move automatically when the player steps on it
-		self.playerref = None			   # this will be taken out because we'll probably want the elevator to be
-										   # activated by external means a lot of the time.
-
+		self.playerref = None
 
 	def intersects(self, other_entity):
 		if Entity.intersects(self, other_entity):
@@ -450,15 +512,6 @@ class Elevator(Entity):
 				or self.geom.right > other_entity.geom.left > self.geom.left) and self.geom.bottom > other_entity.geom.top:
 			return True
 		return False
-
-	def _collision(self, other):
-		if other.name == "player" and self.state == 0 and self.playerref == None:
-			if self.geom.y == self.y1:
-				self.state = 1
-			else:
-				self.state = -1
-			
-			self.playerref = other
 
 	def update(self, time):
 		Entity.update(self, time)
