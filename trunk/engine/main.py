@@ -115,9 +115,9 @@ def main():
 				elif event.key == pygame.K_m:
 					manrise = 0
 				elif event.key == pygame.K_w:
-					t12.player.geom.y -= 100
+					t12.player.vely -= 100000
 				elif event.key == pygame.K_s:
-					t12.player.geom.y += 100
+					t12.player.vely += 100000
 				elif event.key == pygame.K_a:
 					t12.player.velx = -100000
 				elif event.key == pygame.K_d:
@@ -149,19 +149,21 @@ def main():
 		for a in croom.geometry:
 			for b in croom.touch_geom:
 				if a is b: continue # this really should never happen
-				if a.intersects(b):
-					a.collision(b)
+				a.checkCollision(b)
 
 		for a in croom.touch_player:
+			if a is b: continue # this really should never happen
 			if a is t12.player: continue # this really should never happen
-			if a.intersects(t12.player):
-				a.collision(t12.player)
+			a.checkCollision(t12.player)
 
 		if activating:
 			for a in croom.activators:
 				if a is t12.player: continue # this really should never happen
 				if a.intersects(t12.player):
 					a.activate()
+
+		for e in croom.all:
+			e.finalizeCollision()
 
 		if not t12.player.grounded:
 			t12.player.acy = t12.gravity
