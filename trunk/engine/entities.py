@@ -43,6 +43,7 @@ class Entity:
 		self.flagForRemoval = False
 		self.possibleCrosses = []
 		self.checkedCol = {}
+		self.disruptive = False # if this is false, fast-moving objects will know to go through this without stopping.
 
 	def closest(self, ents):
 		""" returns the entity which is closest to me """
@@ -180,6 +181,9 @@ class Entity:
 			This should be used for fast-moving projectiles to make sure they
 			are not going through things. This is /not/ very precise. """
 
+		if not other.disruptive and not self.disruptive:
+			return False
+
 		# let other=O, last=L, current=C
 		# O   L-----------C
 		# see, if O is way over there on the left, who cares about it?
@@ -191,9 +195,6 @@ class Entity:
 		if self.last.bottom <= other.last.top and self.geom.bottom <= other.geom.top: return False
 		if self.last.right <= other.last.left and self.geom.right <= other.geom.left: return False
 		if self.last.left >= other.last.right and self.geom.left >= other.geom.right: return False
-
-		# debug
-		print "you win,", other.name
 
 		mlines = ( (self.last.centerx, self.last.centery, self.geom.centerx, self.geom.centery), # 0 - path line
 			(self.geom.left+1, self.geom.top+1, self.geom.left+1, self.geom.bottom-1), # 1 - left line
@@ -241,7 +242,6 @@ class Entity:
 	def finalizeCollision(self):
 		if len(self.possibleCrosses) > 0:
 			cross = self.was_closest(self.possibleCrosses)
-			print "I hit", cross.name, "out of", len(self.possibleCrosses)
 			self.collision(cross)
 			self.possibleCrosses = []
 		self.checkedCol.clear()
@@ -345,6 +345,7 @@ class Block(FloorBlock):
 	def __init__(self, geom, anim):
 		FloorBlock.__init__(self, geom, anim)
 		self.sticky = False
+		self.disruptive = True
 
 	def update(self, time):
 		Entity.update(self, time)
@@ -358,7 +359,7 @@ class Block(FloorBlock):
 		return False
 
 	def _collision(self, other):
-		if other.geom.bottom < self.geom.top:
+		if other.geom.bottom < self.geom.top and self.last.bottom < self.geom.top:
 			other.grounded = True
 			other.lastFloor = self
 			if self.sticky or other.vely >= 0 and self.vely < other.vely:
@@ -503,6 +504,7 @@ class Elevator(Entity):
 		else:
 			self.dir = -1
 		self.speed = abs( (self.y2 - self.y1) / duration)
+		self.attributes.append("geometry")
 		self.playerref = None
 
 	def intersects(self, other_entity):
