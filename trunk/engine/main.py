@@ -152,7 +152,6 @@ def main():
 				a.checkCollision(b)
 
 		for a in croom.touch_player:
-			if a is b: continue # this really should never happen
 			if a is t12.player: continue # this really should never happen
 			a.checkCollision(t12.player)
 

@@ -181,7 +181,9 @@ class Entity:
 			This should be used for fast-moving projectiles to make sure they
 			are not going through things. This is /not/ very precise. """
 
-		if not other.disruptive and not self.disruptive:
+		if not other.disruptive and not self.disruptive and not (self.attributes.count("touch_player")!=0
+				 and other is t12.player) and not (self.attributes.count("touch_enemies")!=0 and other.attributes.count("actors")!=0
+				 and other is not t12.player):
 			return False
 
 		# let other=O, last=L, current=C
@@ -621,6 +623,11 @@ class DamageProjectile(Projectile):
 	def __init__(self, geom, anim, angle, magnitude, damage):
 		Projectile.__init__(self, geom, anim, angle, magnitude)
 		self.damage = damage
+
+	def finalizeCollision(self):
+		for e in self.possibleCrosses:
+			print "I may have it", e.name
+		Entity.finalizeCollision(self)
 
 	def _collision(self, other):
 		if not Projectile._collision(self, other): return
