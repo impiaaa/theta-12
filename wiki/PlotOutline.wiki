@@ -25,14 +25,19 @@ Weapons/tools acquired: Pirate path: pistol, blunderbuss, cutlass, whiskey bottl
 = 4. Far future (zombie apocalypse) =
 #TODO
 
+During the beginning, say as soon as the door opens there will we a horde of zombie attacking. You will need to jump over trucks, cars, run into shops to pick up ammo and health along the way.
+
 = 5. Nearer future (robot dystopia) =
 #TODO
+Here robots will come as giants and little robots just for the fun of it. These enemies are long distance.
 Controls taught: none.
 Game mechanics taught: Stealth via cloaking, when to use invuln, double jumping.
 Weapons/tools acquired: Cloak, forcefield, RPG, ?
 
 = 6. Modern times (final battle) =
 #TODO
+
+Attacking a large armed turtle.
 Controls taught: none.
 Game mechanics taught: none.
 Weapons/tools acquired: none.
