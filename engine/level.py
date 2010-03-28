@@ -114,10 +114,11 @@ def tload():
 	projTrig = entities.Activator((0, 350, 50, 50), None)
 	def conjureMeat(par=None):
 		meat = entities.DamageProjectile((0, 0, 1, 1),
-			 graphwrap.staticSprite(t12.imageLoader.getImage("global/sprites/animal_meat.png")), 90, 500, 1)
+			 graphwrap.staticSprite(t12.imageLoader.getImage("global/sprites/animal_meat.png")), 90, 10000, 1)
 		meat.adjustGeomToImage()
-		meat.geom.center = (projTrig.geom.centerx, projTrig.geom.top - 300)
+		meat.geom.center = (projTrig.geom.left, projTrig.geom.top - 300)
 		meat.attributes.append("touch_player")
+		meat.name = "meat"
 		projTrig.spawn.append(meat)
 	projTrig.reactors.append(conjureMeat)
 	troom.add(projTrig)
