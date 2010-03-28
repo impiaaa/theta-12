@@ -41,6 +41,8 @@ class Entity:
 		self.collidedWith = [] # list of things I collided with this frame
 		self.artAngle = 0
 		self.flagForRemoval = False
+		self.possibleCrosses = []
+		self.checkedCol = {}
 
 	def closest(self, ents):
 		""" returns the entity which is closest to me """
@@ -60,14 +62,15 @@ class Entity:
 		shortestDist = 0
 		closestEnt = None
 		for e in ents:
-			xd = math.min(e.last.right - self.last.left, self.last.right - e.last.left)
-			yd = math.min(e.last.bottom - self.last.top, self.last.bottom - e.last.top)
+			xd = min(e.last.right - self.last.left, self.last.right - e.last.left)
+			yd = min(e.last.bottom - self.last.top, self.last.bottom - e.last.top)
 			dist = math.sqrt(xd**2 + yd**2)
 			if closestEnt == None or dist < shortestDist:
 				shortestDist = dist
 				closestEnt = e
-		return closestEnd
+		return closestEnt
 		
+
 	def adjustGeomToImage(self):
 		if self.anim == None or self.anim == -1: return
 		m = self.anim.getImage()
@@ -114,11 +117,12 @@ class Entity:
 			ba = pa1[1] - ma*pa1[0]
 		if mb != None:
 			bb = pb1[1] - mb*pb1[0]
+		
 
 		if ma == None: # la is vertical
 			if mb == None: # both lines vertical
 				if abs(pa1[0] - pb1[0]) > thresh: return False # can only intersect if they are on top of each other
-				return atop <= btop <= abot or atop <= bbot <= abot
+				return (atop <= btop <= abot or atop <= bbot <= abot) and pa[0] == pb[0]
 			else:
 				if bleft <= aleft <= bright and atop <= btop <= abot and atop <= bbot <= abot:
 					return True
@@ -152,31 +156,55 @@ class Entity:
 			are not going through things. This is /not/ very precise. """
 
 		mlines = ( (self.last.centerx, self.last.centery, self.geom.centerx, self.geom.centery), # 0 - path line
-			(self.geom.left, self.geom.top, self.geom.left, self.geom.bottom), # 1 - left line
-			(self.geom.right, self.geom.top, self.geom.right, self.geom.bottom), # 2 - right line
-			(self.geom.left, self.geom.top, self.geom.right, self.geom.top), # 3 - top line
-			(self.geom.left, self.geom.bottom, self.geom.right, self.geom.bottom), # 4 - bottom line
-			(self.last.left, self.last.top, self.geom.left, self.geom.top),
-			(self.last.right, self.last.top, self.geom.right, self.geom.top),
-			(self.last.left, self.last.bottom, self.geom.left, self.geom.bottom),
-			(self.last.right, self.last.bottom, self.geom.right, self.geom.bottom)
+			(self.geom.left+1, self.geom.top+1, self.geom.left+1, self.geom.bottom-1), # 1 - left line
+			(self.geom.right-1, self.geom.top+1, self.geom.right-1, self.geom.bottom-1), # 2 - right line
+			(self.geom.left+1, self.geom.top+1, self.geom.right-1, self.geom.top+1), # 3 - top line
+			(self.geom.left+1, self.geom.bottom-1, self.geom.right-1, self.geom.bottom-1), # 4 - bottom line
+			(self.last.left+1, self.last.top+1, self.geom.left+1, self.geom.top+1),
+			(self.last.right-1, self.last.top+1, self.geom.right-1, self.geom.top+1),
+			(self.last.left+1, self.last.bottom-1, self.geom.left+1, self.geom.bottom-1),
+			(self.last.right-1, self.last.bottom-1, self.geom.right-1, self.geom.bottom-1)
 			)
 
-		olines = (  (other.last.centerx, other.last.centery, other.geom.centerx, other.geom.centery), # 0 - path
-			(other.geom.left, other.geom.top, other.geom.left, other.geom.bottom), # 1 - left
-			(other.geom.right, other.geom.top, other.geom.right, other.geom.bottom), # 2 - right
-			(other.geom.left, other.geom.top, other.geom.right, other.geom.top), # 3 - top
-			(other.geom.left, other.geom.bottom, other.geom.right, other.geom.bottom), # 4 - bottom
-			(other.last.left, other.last.top, other.geom.left, other.geom.top),
-			(other.last.right, other.last.top, other.geom.right, other.geom.top),
-			(other.last.left, other.last.bottom, other.geom.left, other.geom.bottom),
-			(other.last.right, other.last.bottom, other.geom.right, other.geom.bottom)
+		olines = ( (other.last.centerx, other.last.centery, other.geom.centerx, other.geom.centery), # 0 - path line
+			(other.geom.left+1, other.geom.top+1, other.geom.left+1, other.geom.bottom-1), # 1 - left line
+			(other.geom.right-1, other.geom.top+1, other.geom.right-1, other.geom.bottom-1), # 2 - right line
+			(other.geom.left+1, other.geom.top+1, other.geom.right-1, other.geom.top+1), # 3 - top line
+			(other.geom.left+1, other.geom.bottom-1, other.geom.right-1, other.geom.bottom-1), # 4 - bottom line
+			(other.last.left+1, other.last.top+1, other.geom.left+1, other.geom.top+1),
+			(other.last.right-1, other.last.top+1, other.geom.right-1, other.geom.top+1),
+			(other.last.left+1, other.last.bottom-1, other.geom.left+1, other.geom.bottom-1),
+			(other.last.right-1, other.last.bottom-1, other.geom.right-1, other.geom.bottom-1)
 			)
+
 		for m in mlines:
 			for o in olines:
 				if self._lint(m, o):
 					return True
 		return False
+
+
+	def checkCollision(self, other):
+		if self.checkedCol.has_key(other.id):
+			return
+		self.checkedCol[other.id] = other
+
+		if self.intersects(other):
+			self.collision(other)
+		
+		if ((abs(self._xdist()) > self.geom.width or abs(self._ydist()) > self.geom.height)):
+			if self._crossed(other):
+				self.possibleCrosses.append(other)
+
+		other.checkCollision(self)
+
+	def finalizeCollision(self):
+		if len(self.possibleCrosses) > 0:
+			cross = self.was_closest(self.possibleCrosses)
+			print "I hit", cross.name, "out of", len(self.possibleCrosses)
+			self.collision(cross)
+			self.possibleCrosses = []
+		self.checkedCol.clear()
 
 	def draw(self, artist):
 		if self.anim is None:
@@ -230,14 +258,7 @@ class Entity:
 		self.collidedWith = [] # clear list of things I collided with
 
 	def intersects(self, other):
-		if self.geom.colliderect(other.geom):
-			return True
-		
-		if (abs(self._xdist()) > self.geom.width or abs(self._ydist()) > self.geom.height
-				or abs(other._xdist()) > other.geom.width or abs(other._ydist()) > other.geom.height):
-			if self._crossed(other):
-				return True
-		return False
+		return self.geom.colliderect(other.geom)
 
 	def collision(self, other):
 		""" Called by external classes and should never be overriden. """
