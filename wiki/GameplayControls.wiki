@@ -1,4 +1,3 @@
-#labels Phase-Design
 # list of controls for actually playing the game
 
 # we should probably have the controls be user-defined, so let's put defaults here.
@@ -42,3 +41,11 @@ Add your content here.  Format your content with:
   * Activate - c
   * Pick something up - c
   * play/pause - esc
+==Alex's Suggested controls==
+  * Go left - w
+  * Go right - d
+  * Jump - k
+  * Attack - j
+  * Activate - i
+  * Pick something up - l
+  * Play/pause - p
