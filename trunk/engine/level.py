@@ -166,7 +166,7 @@ def tload():
 	elevator = entities.Elevator((600, 200, 150, 200), 100, 0.5)
 	troom.add(elevator)
 
-	for i in range(20):
+	for i in xrange(100):
 		# xpos calculation
 		if i < 8:
 			blah = 1000 + 200*i
@@ -175,5 +175,21 @@ def tload():
 		b = entities.Block((blah, 380-30*i, 100, 20), None)
 		b.name = "Step " + str(i)
 		troom.add(b)
+
+	shifter = entities.Block((-100, 380, 100, 20), None)
+	shifter.shiftdir = 0
+	def shifterShift():
+		if shifter.shiftdir == -1:
+			if shifter.geom.left <= -200:
+				shifter.velx = 100
+				shifter.vely = 50
+				shifter.shiftdir = 1
+		elif shifter.shiftdir == 1 or shifter.shiftdir == 0:
+			if shifter.geom.left >= -100 or shifter.shiftdir == 0:
+				shifter.velx = -100
+				shifter.vely = -50
+				shifter.shiftdir = -1
+	shifter._extraUpdate = shifterShift
+	troom.add(shifter)
 
 tlevel.load = tload

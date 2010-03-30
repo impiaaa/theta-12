@@ -99,10 +99,12 @@ def main():
 				return
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
-					t12.player.left()
+					t12.flags["input left"] = True
+					t12.flags["input right"] = False
 					t12.player.anim.runSequence("left")
 				elif event.key == pygame.K_RIGHT:
-					t12.player.right()
+					t12.flags["input right"] = True
+					t12.flags["input left"] = False
 					t12.player.anim.runSequence("right")
 				elif event.key == pygame.K_UP:
 					if t12.player.grounded:
@@ -126,11 +128,26 @@ def main():
 					t12.camy = t12.player.geom.centery - screen.get_height()/2
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT and t12.player.velx < 0:
-					t12.player.velx = 0
+					t12.flags["input left"] = False
+					#t12.player.velx = 0
 				elif event.key == pygame.K_RIGHT and t12.player.velx > 0:
-					t12.player.velx = 0
+					t12.flags["input right"] = False
+					#t12.player.velx = 0
 				elif event.key == pygame.K_SPACE:
 					activating = False
+
+		# apply air friction
+		t12.player.decelerate(2000*seconds, 0)
+
+		# make input mac-friendly
+		if not pygame.key.get_pressed()[pygame.K_LEFT]:
+			t12.flags["input left"] = False
+		if not pygame.key.get_pressed()[pygame.K_RIGHT]:
+			t12.flags["input right"] = False
+		if t12.flags["input left"]: 
+			t12.player.left()
+		if t12.flags["input right"]: 
+			t12.player.right()
 
 
 		# update movement/spawn things

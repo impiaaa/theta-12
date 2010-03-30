@@ -44,6 +44,7 @@ class Entity:
 		self.possibleCrosses = []
 		self.checkedCol = {}
 		self.disruptive = False # if this is false, fast-moving objects will know to go through this without stopping.
+		self.more_vx, self.more_vy = 0, 0
 
 	def closest(self, ents):
 		""" returns the entity which is closest to me """
@@ -283,8 +284,8 @@ class Entity:
 
 		self.velx += self.acx * time
 		self.vely += self.acy * time
-		self._incx += self.velx * time
-		self._incy += self.vely * time
+		self._incx += (self.velx+self.more_vx) * time
+		self._incy += (self.vely+self.more_vy) * time
 		
 
 		if abs(self._incx) > 0:
@@ -296,8 +297,13 @@ class Entity:
 			self.geom.centery += val
 			self._incy -= val
 
+		self.more_vx, self.more_vy = 0, 0
 		self.grounded = False # reset grounded
 		self.collidedWith = [] # clear list of things I collided with
+		self._extraUpdate()
+
+	def _extraUpdate(self):
+		return None
 
 	def intersects(self, other):
 		return self.geom.colliderect(other.geom)
@@ -364,11 +370,13 @@ class Block(FloorBlock):
 		if other.geom.bottom < self.geom.top and self.last.bottom < self.geom.top:
 			other.grounded = True
 			other.lastFloor = self
+			other.more_vx = self.velx
+			other.more_vy = self.vely
 			if self.sticky or other.vely >= 0 and self.vely < other.vely:
-				other.vely = self.vely
 				other.geom.bottom = self.geom.top
 				if self.sticky and other.vely < 0:
 					other.vely = 0
+					other.more_vy = 0
 			return
 
 		"""
@@ -397,6 +405,9 @@ class Block(FloorBlock):
 			other.geom.bottom = self.geom.top
 			other.grounded = True
 			other.lastFloor = self
+			other.more_vx = self.velx
+			if not self.sticky:
+				other.more_vy = self.vely
 			if self.sticky or (other.vely >= 0 and self.vely < other.vely):
 				other.vely, other.acy = self.vely, 0
 				if self.sticky and other.vely < 0:
@@ -566,7 +577,10 @@ class Actor(Entity):
 
 		self.health = 10 # arbitrary default
 		self.jumpheight = 50 # arbitrary
-		self.speed = 100 # horizontal movement speed. may be replaced by acceleration at some point.
+		self.speed = 100 # maximum horizontal movement speed (pixels/second)
+		self.acceleration = 500 # pixels/sec^2 acceleration
+								# if you want the player to accelerate to max-speed
+								# instantly just set this to a really big number (like self.speed * 10**3)
 		self.lastFloor = None # the last entity I stood on
 		self.update(0) # for the feetbox
 
@@ -578,10 +592,10 @@ class Actor(Entity):
 		self.geom.top -= 3
 
 	def left(self):
-		self.velx = -self.speed
+		self.velx = max(-self.speed, self.velx - self.acceleration)
 
 	def right(self):
-		self.velx = self.speed
+		self.velx = min(self.speed, self.velx + self.acceleration)
 
 	def stopX(self):
 		self.velx = 0
@@ -633,6 +647,3 @@ class DamageProjectile(Projectile):
 		if not Projectile._collision(self, other): return
 		if isinstance(other, Actor):
 			other.health -= self.damage
-			print other.name, "is pwned! He now only has", other.health, "health!"
-		else:
-			print "Aww, I hit a wall", other.name
