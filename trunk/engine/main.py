@@ -85,6 +85,7 @@ def main():
 	while 1:
 		ctime = time.time()
 		seconds = ctime - last_time
+		t12.seconds_passed = seconds
 		last_time = time.time()
 		if firstframe:
 			seconds = 0
@@ -181,10 +182,11 @@ def main():
 		for e in croom.all:
 			e.finalizeCollision()
 
-		if not t12.player.grounded:
-			t12.player.acy = t12.gravity
-		else:
-			t12.player.acy = 0
+		for a in croom.actors:
+			if not a.grounded:
+				a.acy = t12.gravity
+			else:
+				a.acy = 0
 
 		wid, hig = screen.get_size()
 		wd = t12.player.geom.centerx - wid/2

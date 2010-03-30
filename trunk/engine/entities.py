@@ -45,6 +45,7 @@ class Entity:
 		self.checkedCol = {}
 		self.disruptive = False # if this is false, fast-moving objects will know to go through this without stopping.
 		self.more_vx, self.more_vy = 0, 0
+		self.autoconform_geom = False # if true, the geometry of this object will automatically scale to the size of its graphics
 
 	def closest(self, ents):
 		""" returns the entity which is closest to me """
@@ -89,8 +90,11 @@ class Entity:
 		if self.anim == None or self.anim == -1: return
 		m = self.anim.getImage()
 		if m == None: return
+		centx = self.geom.centerx
+		geomb, lastb = self.geom.bottom, self.last.bottom
 		self.geom.width, self.geom.height = m.get_size()
 		self.last.size = self.geom.size
+		self.geom.bottom, self.last.bottom, self.geom.centerx = geomb, lastb, centx
 
 	def _xdist(self):
 		""" returns the x distance travelled since last frame """
@@ -282,6 +286,13 @@ class Entity:
 	def update(self, time):
 		self.updatelast()
 
+		if self.autoconform_geom and self.anim is not None and self.anim != -1:
+			img = self.anim.getImage()
+			if img != None:
+				iw, ih = img.get_size()
+				if self.geom.width != iw or self.geom.height != ih:
+					self.adjustGeomToImage()
+
 		self.velx += self.acx * time
 		self.vely += self.acy * time
 		self._incx += (self.velx+self.more_vx) * time
@@ -297,10 +308,12 @@ class Entity:
 			self.geom.centery += val
 			self._incy -= val
 
+
+		self._extraUpdate()
+
 		self.more_vx, self.more_vy = 0, 0
 		self.grounded = False # reset grounded
 		self.collidedWith = [] # clear list of things I collided with
-		self._extraUpdate()
 
 	def _extraUpdate(self):
 		return None
@@ -378,18 +391,6 @@ class Block(FloorBlock):
 					other.vely = 0
 					other.more_vy = 0
 			return
-
-		"""
-		ontop = other.geom.bottom == self.geom.top
-		onbottom = other.geom.top == self.geom.bottom
-		onleft = other.geom.right == self.geom.left
-		onright = other.geom.left == self.geom.right
-
-		wontop = other.last.bottom == self.last.top
-		wonbottom = other.last.top == self.last.bottom
-		wonleft = other.last.right == self.last.left
-		wonright = other.last.left == self.last.right
-		"""
 
 		above = other.geom.bottom < self.geom.top
 		below = other.geom.top > self.geom.bottom
@@ -469,8 +470,8 @@ class MotionTrigger(TriggerEntity):
 		self.attributes.append("geometry")
 
 	def _collision(self, other):
-		if other.name == "player":
-			TriggerEntity.trigger(self)
+		if isinstance(other, Actor):
+			TriggerEntity.trigger(self, other)
 
 class Elevator(Entity):
 
@@ -583,8 +584,13 @@ class Actor(Entity):
 								# instantly just set this to a really big number (like self.speed * 10**3)
 		self.lastFloor = None # the last entity I stood on
 		self.update(0) # for the feetbox
+		self.think() # for AI
+
+	def think(self):
+		return None
 
 	def update(self, time):
+		self.think()
 		Entity.update(self, time)
 
 	def jump(self):

@@ -1,4 +1,4 @@
-import entities, graphwrap, t12
+import entities, graphwrap, t12, pygame
 
 # this is just a basic template for now and will likely be expanded upon.
 
@@ -146,13 +146,15 @@ def tload():
 		trig2.anim.runSequence("pressed")
 		trig.anim.runSequence("unpressed")
 	def react3(par=None):
-		if t12.player != None:
-			if t12.player.lastFloor == None:
-				t12.player.geom.bottom = fblock.geom.top-5
-				t12.player.geom.centerx = fblock.geom.centerx
+		if par != None and isinstance(par, entities.Actor):
+			if par.lastFloor == None:
+				par.geom.bottom = fblock.geom.top-5
+				par.geom.centerx = fblock.geom.centerx
+				print "Sorry", par.name, "you have no records."
 			else:
-				t12.player.geom.centerx, t12.player.geom.bottom = t12.player.lastFloor.geom.centerx, t12.player.lastFloor.geom.top
-				t12.player.updatelast()
+				par.geom.centerx, par.geom.bottom = par.lastFloor.geom.centerx, par.lastFloor.geom.top
+				par.updatelast()
+				print "Up you go,", par.name, "!"
 	trig.reactors.append(reactor)
 	trig2.reactors.append(reactor2)
 	trig3.reactors.append(react3)
@@ -191,5 +193,42 @@ def tload():
 				shifter.shiftdir = -1
 	shifter._extraUpdate = shifterShift
 	troom.add(shifter)
+
+	guyanim = graphwrap.AnimSprite()
+	guyanim.putSequence("right", graphwrap.staticSequence(
+						t12.imageLoader.getImage("global/sprites/person_stand.png")))
+	guyanim.putSequence("left", graphwrap.staticSequence(
+						pygame.transform.flip(t12.imageLoader.getImage("global/sprites/person_stand.png"), 1, 0)))
+	guyanim.putSequence("right punch", graphwrap.staticSequence(
+						t12.imageLoader.getImage("global/sprites/person_punch.png")))
+	guyanim.putSequence("left punch", graphwrap.staticSequence(
+						pygame.transform.flip(t12.imageLoader.getImage("global/sprites/person_punch.png"), 1, 0)))
+	guyanim.runSequence("left")
+	guy = entities.Actor((0, 0, 1, 1), guyanim)
+	guy.name = "Guy"
+	guy.geom.centerx = elevator.geom.centerx
+	guy.geom.bottom = elevator.geom.top - 1
+	guy.autoconform_geom = True
+
+	def guythink():
+		if guy.geom.left > t12.player.geom.right:
+			guy.left()
+			guy.anim.runSequence("left")
+		elif guy.geom.right < t12.player.geom.left:
+			guy.right()
+			guy.anim.runSequence("right")
+		else:
+			guy.decelerate(t12.seconds_passed * 300, 0)
+
+		if guy.geom.bottom > t12.player.geom.bottom and guy.grounded:
+			guy.jump()
+		elif guy.geom.bottom == t12.player.geom.bottom:
+			if guy.anim.seq_name == "left":
+				guy.anim.runSequence("left punch")
+			elif guy.anim.seq_name == "right":
+				guy.anim.runSequence("right punch")
+	guy.think = guythink
+
+	troom.add(guy)
 
 tlevel.load = tload
