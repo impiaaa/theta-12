@@ -32,6 +32,7 @@ class AnimSprite:
 		self.sequences = {}
 		self.current_seq = None
 		self.current_image = None
+		self.seq_name = None
 
 	def update(self, time):
 		if self.current_seq is not None:
@@ -49,6 +50,7 @@ class AnimSprite:
 		elif isinstance(seq, str):
 			if self.sequences.has_key(seq):
 				self.current_seq = self.sequences[seq]
+				self.seq_name = seq
 		else:
 			self.current_seq = seq.clone()
 
