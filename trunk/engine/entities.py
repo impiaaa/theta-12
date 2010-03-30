@@ -309,13 +309,13 @@ class Entity:
 			self._incy -= val
 
 
-		self._extraUpdate()
+		self._extraUpdate(self)
 
 		self.more_vx, self.more_vy = 0, 0
 		self.grounded = False # reset grounded
 		self.collidedWith = [] # clear list of things I collided with
 
-	def _extraUpdate(self):
+	def _extraUpdate(self, par=None):
 		return None
 
 	def intersects(self, other):
@@ -380,16 +380,18 @@ class Block(FloorBlock):
 		return False
 
 	def _collision(self, other):
-		if other.geom.bottom < self.geom.top and self.last.bottom < self.geom.top:
+		if other.geom.bottom < self.geom.top and other.last.bottom < self.last.top:
+			if other is t12.player and self.name == "Elevator Roof" and other.vely != 0:
+				print "first", t12.game_time, other.last.y < other.geom.y
 			other.grounded = True
 			other.lastFloor = self
 			other.more_vx = self.velx
-			other.more_vy = self.vely
-			if self.sticky or other.vely >= 0 and self.vely < other.vely:
+			if self.vely > 0:
+				other.more_vy = self.vely
+			if self.sticky or (other.vely >= 0 and self.vely < other.vely):
 				other.geom.bottom = self.geom.top
 				if self.sticky and other.vely < 0:
 					other.vely = 0
-					other.more_vy = 0
 			return
 
 		above = other.geom.bottom < self.geom.top
@@ -403,14 +405,16 @@ class Block(FloorBlock):
 		wright = other.last.left >= self.last.right
 
 		if wabove:
+			if other is t12.player and self.name == "Elevator Roof" and other.vely != 0:
+				print "second", t12.game_time, other.last.y < other.geom.y
 			other.geom.bottom = self.geom.top
 			other.grounded = True
 			other.lastFloor = self
 			other.more_vx = self.velx
-			if not self.sticky:
+			if self.vely > 0:
 				other.more_vy = self.vely
 			if self.sticky or (other.vely >= 0 and self.vely < other.vely):
-				other.vely, other.acy = self.vely, 0
+				other.vely, other.acy = 0, 0
 				if self.sticky and other.vely < 0:
 					other.vely = 0
 		elif wleft and not left:
@@ -423,11 +427,13 @@ class Block(FloorBlock):
 			other.geom.top = self.geom.bottom
 			other.vely = self.vely
 		elif not above:
+			if other is t12.player and self.name == "Elevator Roof":
+				print "third", t12.game_time, other.last.y < other.geom.y
 			other.geom.bottom = self.geom.top
 			other.grounded = True
 			other.lastFloor = self
 			if other.vely >= 0:
-				other.vely, other.acy = self.vely, 0
+				other.more_vy, other.acy = self.vely, 0
 
 class TriggerEntity(Entity):
 	def __init__(self, geom, anim):
@@ -632,6 +638,14 @@ class Projectile(Entity):
 		self.artAngle = angle
 		self.attributes.append("touch_geom")
 
+	def setAngle(self, angle):
+		self.artAngle = angle
+		self.setMagnitude(math.sqrt(self.velx**2 + self.vely**2))
+
+	def setMagnitude(self, magnitude):
+		self.velx = magnitude * math.cos(math.radians(self.artAngle))
+		self.vely = magnitude * math.sin(math.radians(self.artAngle))
+
 	def _collision(self, other):
 		if other.attributes.count("geometry") > 0 or isinstance(other, Actor):
 			self.anim.runSequence("hit")
@@ -645,8 +659,6 @@ class DamageProjectile(Projectile):
 		self.damage = damage
 
 	def finalizeCollision(self):
-		for e in self.possibleCrosses:
-			print "I may have it", e.name
 		Entity.finalizeCollision(self)
 
 	def _collision(self, other):
