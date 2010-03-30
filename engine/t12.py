@@ -7,6 +7,7 @@ seq_currentid = 0
 anim_sequences = {}
 gravity = 386 # 9.8 m/s, according to the art team's scale
 camy = 0 # vertical camera offset to be reset each time a room is loaded.
-seconds_passed = 0
+seconds_passed = 0 # time passed in the last frame
+game_time = 0 # seconds passed during the whole game
 
 flags = {"input left": False, "input right": False}

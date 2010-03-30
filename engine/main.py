@@ -86,6 +86,7 @@ def main():
 		ctime = time.time()
 		seconds = ctime - last_time
 		t12.seconds_passed = seconds
+		t12.game_time += seconds
 		last_time = time.time()
 		if firstframe:
 			seconds = 0
@@ -138,7 +139,7 @@ def main():
 					activating = False
 
 		# apply air friction
-		t12.player.decelerate(2000*seconds, 0)
+		t12.player.decelerate(5000*seconds, 0) # this is really high because low decelerations make it hard.
 
 		# make input mac-friendly
 		if not pygame.key.get_pressed()[pygame.K_LEFT]:

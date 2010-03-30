@@ -111,17 +111,6 @@ def tload():
 	trig2.adjustGeomToImage()
 	trig.geom.bottom, trig2.geom.bottom = 400, 400
 
-	projTrig = entities.Activator((0, 350, 50, 50), None)
-	def conjureMeat(par=None):
-		meat = entities.DamageProjectile((0, 0, 1, 1),
-			 graphwrap.staticSprite(t12.imageLoader.getImage("global/sprites/animal_meat.png")), 90, 10000, 1)
-		meat.adjustGeomToImage()
-		meat.geom.center = (projTrig.geom.left, projTrig.geom.top - 300)
-		meat.attributes.append("touch_player")
-		meat.name = "meat"
-		projTrig.spawn.append(meat)
-	projTrig.reactors.append(conjureMeat)
-	troom.add(projTrig)
 
 	troom.add(trig)
 	troom.add(trig2)
@@ -150,11 +139,9 @@ def tload():
 			if par.lastFloor == None:
 				par.geom.bottom = fblock.geom.top-5
 				par.geom.centerx = fblock.geom.centerx
-				print "Sorry", par.name, "you have no records."
 			else:
 				par.geom.centerx, par.geom.bottom = par.lastFloor.geom.centerx, par.lastFloor.geom.top
 				par.updatelast()
-				print "Up you go,", par.name, "!"
 	trig.reactors.append(reactor)
 	trig2.reactors.append(reactor2)
 	trig3.reactors.append(react3)
@@ -168,7 +155,7 @@ def tload():
 	elevator = entities.Elevator((600, 200, 150, 200), 100, 0.5)
 	troom.add(elevator)
 
-	for i in xrange(100):
+	for i in xrange(18):
 		# xpos calculation
 		if i < 8:
 			blah = 1000 + 200*i
@@ -178,21 +165,36 @@ def tload():
 		b.name = "Step " + str(i)
 		troom.add(b)
 
-	shifter = entities.Block((-100, 380, 100, 20), None)
+	shifter = entities.Block((-100, 420, 100, 20), None)
+	shifter.name = "shifter"
 	shifter.shiftdir = 0
-	def shifterShift():
-		if shifter.shiftdir == -1:
-			if shifter.geom.left <= -200:
-				shifter.velx = 100
-				shifter.vely = 50
-				shifter.shiftdir = 1
-		elif shifter.shiftdir == 1 or shifter.shiftdir == 0:
-			if shifter.geom.left >= -100 or shifter.shiftdir == 0:
-				shifter.velx = -100
-				shifter.vely = -50
-				shifter.shiftdir = -1
+	shifter.start = shifter.geom.left
+
+	shifter2 = entities.Block((shifter.geom.left - 1200, -580, 100, 20), None)
+	shifter2.name = "shifter2"
+	shifter2.shiftdir = 0
+	shifter2.start = shifter2.geom.left
+
+	def shifterShift(par):
+		if par.name == "shifter" and pygame.key.get_pressed()[pygame.K_i]:
+			t12.player.geom.centerx = par.geom.centerx
+			t12.player.geom.bottom = par.geom.top
+
+		if par.shiftdir == -1:
+			if par.geom.left <= par.start-1000:
+				par.velx = 500
+				par.vely = 500
+				par.shiftdir = 1
+		elif par.shiftdir == 1 or par.shiftdir == 0:
+			if par.geom.left >= par.start or par.shiftdir == 0:
+				par.velx = -500
+				par.vely = -500
+				par.shiftdir = -1
 	shifter._extraUpdate = shifterShift
+	shifter2._extraUpdate = shifterShift
 	troom.add(shifter)
+	troom.add(shifter2)
+	troom.add(entities.Block((shifter.geom.left - 1100, -580, 100, 20), None))
 
 	guyanim = graphwrap.AnimSprite()
 	guyanim.putSequence("right", graphwrap.staticSequence(
@@ -206,27 +208,57 @@ def tload():
 	guyanim.runSequence("left")
 	guy = entities.Actor((0, 0, 1, 1), guyanim)
 	guy.name = "Guy"
+	guy.jumpheight = 300
+	guy.speed = 200
+	guy.acceleration = 100
 	guy.geom.centerx = elevator.geom.centerx
 	guy.geom.bottom = elevator.geom.top - 1
 	guy.autoconform_geom = True
 
 	def guythink():
-		if guy.geom.left > t12.player.geom.right:
+		guy.lastThrow = 0
+		if guy.geom.centerx < t12.player.geom.centerx:
+			if guy.anim.seq_name == "left": guy.anim.runSequence("right")
+			if guy.anim.seq_name == "left punch": guy.anim.runSequence("right punch")
+		elif guy.geom.centerx > t12.player.geom.centerx:
+			if guy.anim.seq_name == "right": guy.anim.runSequence("left")
+			if guy.anim.seq_name == "right punch": guy.anim.runSequence("left punch")
+
+		if guy.geom.left > t12.player.geom.right+50:
 			guy.left()
 			guy.anim.runSequence("left")
-		elif guy.geom.right < t12.player.geom.left:
+		elif guy.geom.right < t12.player.geom.left-50:
 			guy.right()
 			guy.anim.runSequence("right")
 		else:
-			guy.decelerate(t12.seconds_passed * 300, 0)
+			guy.velx = 0
 
 		if guy.geom.bottom > t12.player.geom.bottom and guy.grounded:
 			guy.jump()
-		elif guy.geom.bottom == t12.player.geom.bottom:
-			if guy.anim.seq_name == "left":
-				guy.anim.runSequence("left punch")
-			elif guy.anim.seq_name == "right":
-				guy.anim.runSequence("right punch")
+			if guy.anim.seq_name == "left punch": guy.anim.runSequence("left")
+			elif guy.anim.seq_name == "right punch": guy.anim.runSequence("right")
+		elif t12.player.geom.bottom > guy.geom.bottom > t12.player.geom.top or t12.player.geom.bottom > guy.geom.top > t12.player.geom.top:
+			if guy.anim.seq_name == "left": guy.anim.runSequence("left punch")
+			elif guy.anim.seq_name == "right": guy.anim.runSequence("right punch")
+
+			tt = int(t12.game_time * 100)
+			if tt != guy.lastThrow and tt % 10 == 0:
+				guy.lastThrow = tt
+				meat = entities.DamageProjectile((0, 0, 1, 1),
+					graphwrap.staticSprite(pygame.transform.flip(
+						t12.imageLoader.getImage("global/sprites/animal_meat.png"), 1, 0)), 90, 1000, 1)
+				meat.adjustGeomToImage()
+				meat.geom.center = guy.geom.center
+				meat.attributes.append("touch_player")
+				meat.name = "Doom"
+				if guy.anim.seq_name == "left punch": meat.setAngle(180)
+				elif guy.anim.seq_name == "right punch": meat.setAngle(0)
+				guy.spawn.append(meat)
+		else:
+			if guy.anim.seq_name == "left punch": guy.anim.runSequence("left")
+			elif guy.anim.seq_name == "right punch": guy.anim.runSequence("right")
+				
+				
 	guy.think = guythink
 
 	troom.add(guy)
