@@ -1,14 +1,9 @@
 #labels Phase-Implementation
-Put _all_ art elements required here. Eg, not just "velociraptor", but "velociraptor with pirate outfit", "velociraptor with ninja outfit", etc. (don't forget things like explosion graphics, barrels, clouds, lampposts, wall panels, graffiti, and other background stuff)
-
-Please note, the scale for the art is 1 pixel = 2 inches.
-
-Alexander Pumerantz: ok the velociraptor is made. you can get it and look at it. it currently does not have feathers. if you would like feathers tell me and i can put them on. i wil be making the moving sequences as well.  i am planning making the ninja and pirate velociraptors a costume instead of a person riding it. it would look cooler in my opinion and easier to make. if you would like to text or talk to me to tell me your opinion so i can incorporate it, my number is (909)816-6557
-
-Gabriel Ortega-Gingrich:  I just made a button that could be used, but shouldn't come into the game until maybe the robot level.  I also am making some of the smaller items that the player will interact with in many parts of the game.  An example of this is the meat that could potentially restore health that could be used in the early game.  I would like some more suggestions as to what else I can be working on.
-
-==IMPORTANT==
-Make sure the edges of your artwork come up to the border of the image. The velociraptor is currently "floating" a couple pixels above the ground because the image height is a bit bigger than the actual image content.
+= Notes =
+ * The scale for the art is 1 pixel = 2 inches.
+ * Make sure the edges of your artwork come up to the border of the image. The velociraptor is currently "floating" a couple pixels above the ground because the image height is a bit bigger than the actual image content.
+ * If you would like to work on something listed here that you think will take a long time, write your name next to the item.
+ * Please edit and add to this list!
 
 = Global =
  * Medkit (meat?)
@@ -33,7 +28,14 @@ Make sure the edges of your artwork come up to the border of the image. The velo
 = 2. Prehistoric Jungle =
 == Characters ==
  * Velociraptors (x5)
- * Other dinosaurs
+ * Other dinosaurs:
+  * compsognathus
+  * Acheopterix?
+  * T-Rex?
+  * Allosaurus
+  * Stegosaurus
+  * Triceratops
+  * Apatosaurus?
 == Props ==
  * Nest
  * Tree (x3)
