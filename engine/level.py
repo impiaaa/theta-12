@@ -261,6 +261,6 @@ def tload():
 				
 	guy.think = guythink
 
-	troom.add(guy)
+	#troom.add(guy)
 
 tlevel.load = tload

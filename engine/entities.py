@@ -46,6 +46,7 @@ class Entity:
 		self.disruptive = False # if this is false, fast-moving objects will know to go through this without stopping.
 		self.more_vx, self.more_vy = 0, 0
 		self.autoconform_geom = False # if true, the geometry of this object will automatically scale to the size of its graphics
+		self.mobile = True # set this to false if this object never moves, or it is moved by a parent object.
 
 	def closest(self, ents):
 		""" returns the entity which is closest to me """
@@ -283,16 +284,7 @@ class Entity:
 		self.last.width = self.geom.width
 		self.last.height = self.geom.height
 
-	def update(self, time):
-		self.updatelast()
-
-		if self.autoconform_geom and self.anim is not None and self.anim != -1:
-			img = self.anim.getImage()
-			if img != None:
-				iw, ih = img.get_size()
-				if self.geom.width != iw or self.geom.height != ih:
-					self.adjustGeomToImage()
-
+	def _updateMovement(self, time):
 		self.velx += self.acx * time
 		self.vely += self.acy * time
 		self._incx += (self.velx+self.more_vx) * time
@@ -308,6 +300,19 @@ class Entity:
 			self.geom.centery += val
 			self._incy -= val
 
+
+	def update(self, time, move=True):
+		self.updatelast()
+
+		if self.autoconform_geom and self.anim is not None and self.anim != -1:
+			img = self.anim.getImage()
+			if img != None:
+				iw, ih = img.get_size()
+				if self.geom.width != iw or self.geom.height != ih:
+					self.adjustGeomToImage()
+
+		if move and self.mobile:
+			self._updateMovement(time)
 
 		self._extraUpdate(self)
 
@@ -365,11 +370,8 @@ class FloorBlock(Entity):
 class Block(FloorBlock):
 	def __init__(self, geom, anim):
 		FloorBlock.__init__(self, geom, anim)
-		self.sticky = False
-		self.disruptive = True
-
-	def update(self, time):
-		Entity.update(self, time)
+		self.sticky = True # I decided to set this to true by default because this is how most platformers behave.
+		self.disruptive = True # yes, fast moving objects should stop when they hit this.
 
 	def intersects(self, other_entity):
 		if Entity.intersects(self, other_entity):
@@ -381,17 +383,22 @@ class Block(FloorBlock):
 
 	def _collision(self, other):
 		if other.geom.bottom < self.geom.top and other.last.bottom < self.last.top:
-			if other is t12.player and self.name == "Elevator Roof" and other.vely != 0:
-				print "first", t12.game_time, other.last.y < other.geom.y
 			other.grounded = True
 			other.lastFloor = self
-			other.more_vx = self.velx
-			if self.vely > 0:
-				other.more_vy = self.vely
-			if self.sticky or (other.vely >= 0 and self.vely < other.vely):
+
+			if self.sticky or (other.vely + other.more_vy) > 0:
 				other.geom.bottom = self.geom.top
-				if self.sticky and other.vely < 0:
-					other.vely = 0
+
+			if self.sticky:
+				other.more_vy = self.vely
+			else:
+				other.more_vy = 0
+				if (self.vely > other.vely and other.vely >= 0) or (self.vely < other.vely and self.vely < 0):
+					other.vely = self.vely
+
+			#if other is t12.player and self.name == "Elevator Roof":
+			#	print "first", t12.game_time, self.vely, other.vely, other.more_vy, self.sticky
+
 			return
 
 		above = other.geom.bottom < self.geom.top
@@ -405,18 +412,20 @@ class Block(FloorBlock):
 		wright = other.last.left >= self.last.right
 
 		if wabove:
-			if other is t12.player and self.name == "Elevator Roof" and other.vely != 0:
-				print "second", t12.game_time, other.last.y < other.geom.y
 			other.geom.bottom = self.geom.top
 			other.grounded = True
 			other.lastFloor = self
 			other.more_vx = self.velx
-			if self.vely > 0:
+
+			if self.sticky:
 				other.more_vy = self.vely
-			if self.sticky or (other.vely >= 0 and self.vely < other.vely):
-				other.vely, other.acy = 0, 0
-				if self.sticky and other.vely < 0:
-					other.vely = 0
+			else:
+				other.more_vy = 0
+				if (self.vely > other.vely and other.vely >= 0) or (self.vely < other.vely and self.vely < 0):
+					other.vely = self.vely
+
+			#if other is t12.player and self.name == "Elevator Roof":
+			#	print "second", t12.game_time, self.vely, other.vely, other.more_vy, self.sticky
 		elif wleft and not left:
 			other.geom.right = self.geom.left
 			other.velx = self.velx
@@ -427,13 +436,23 @@ class Block(FloorBlock):
 			other.geom.top = self.geom.bottom
 			other.vely = self.vely
 		elif not above:
-			if other is t12.player and self.name == "Elevator Roof":
-				print "third", t12.game_time, other.last.y < other.geom.y
 			other.geom.bottom = self.geom.top
 			other.grounded = True
 			other.lastFloor = self
-			if other.vely >= 0:
-				other.more_vy, other.acy = self.vely, 0
+
+			if self.sticky:
+				other.more_vy = self.vely
+			else:
+				other.more_vy = 0
+				if (self.vely > other.vely and other.vely >= 0) or (self.vely < other.vely and self.vely < 0):
+					other.vely = self.vely
+
+			#if other is t12.player and self.name == "Elevator Roof":
+			#	print "third", t12.game_time, self.vely, other.vely, other.more_vy, self.sticky
+
+		if self.sticky and (other.vely + other.more_vy) < self.vely:
+			other.vely = 0
+			other.more_vy = self.vely
 
 class TriggerEntity(Entity):
 	def __init__(self, geom, anim):
@@ -480,25 +499,27 @@ class MotionTrigger(TriggerEntity):
 			TriggerEntity.trigger(self, other)
 
 class Elevator(Entity):
-
 	def _collisionF(self, other):
 		Block._collision(self.floor, other)
-		if other.name == "player" and self.state == 0 and self.playerref == None:
+		if other is not t12.player: return
+		if self.state == 0 and self.playerref == None:
 			if self.geom.y == self.y1:
 				self.state = 1
 			else:
 				self.state = -1
 			
-			self.playerref = other
+		self.playerref = other
+
 	def _collisionR(self, other):
 		Block._collision(self.roof, other)
-		if other.name == "player" and self.state == 0 and self.playerref == None:
+		if other is not t12.player: return
+		if self.state == 0 and self.playerref == None:
 			if self.geom.y == self.y1:
 				self.state = 1
 			else:
 				self.state = -1
 			
-			self.playerref = other
+		self.playerref = other
 
 	def __init__(self, geom, targety, duration):
 		""" Paramaters: geometry (rectangle),  targety (where the elevator will go), and duration (the 
@@ -513,6 +534,7 @@ class Elevator(Entity):
 		self.name = "Elevator"
 		self.floor._collision = self._collisionF
 		self.roof._collision = self._collisionR
+		self.floor.mobile, self.roof.mobile = False, False
 		self.spawn.append(self.floor)
 		self.spawn.append(self.roof)
 		self.y1 = self.geom.top
@@ -536,7 +558,6 @@ class Elevator(Entity):
 		return False
 
 	def update(self, time):
-		Entity.update(self, time)
 		if self.state == 0:
 			self.vely = 0
 		elif self.state == 1:
@@ -561,13 +582,15 @@ class Elevator(Entity):
 		self.floor.vely = self.vely
 		self.roof.vely = self.vely
 
+		Entity.update(self, time)
+
 		self.floor.updatelast()
 		self.roof.updatelast()
 		self.floor.geom.top = self.geom.bottom - 20
 		self.roof.geom.top = self.geom.top
 
 		if self.playerref != None:
-			if not self.intersects(self.playerref):
+			if not self.roof.intersects(self.playerref) and not self.floor.intersects(self.playerref):
 				self.playerref = None
 
 class Actor(Entity):
@@ -602,6 +625,8 @@ class Actor(Entity):
 	def jump(self):
 		self.vely = -math.sqrt(t12.gravity * self.jumpheight * 2)
 		self.geom.top -= 3
+		self.vely += self.more_vy
+		self.more_vy = 0
 
 	def left(self):
 		self.velx = max(-self.speed, self.velx - self.acceleration)
