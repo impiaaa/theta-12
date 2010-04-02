@@ -660,16 +660,19 @@ class Projectile(Entity):
 		Entity.__init__(self, geom, anim)
 		self.velx = magnitude * math.cos(math.radians(angle))
 		self.vely = magnitude * math.sin(math.radians(angle))
+		self.baseAngle = angle
 		self.artAngle = angle
+		self.moveAngle = angle
 		self.attributes.append("touch_geom")
 
 	def setAngle(self, angle):
-		self.artAngle = angle
+		self.artAngle = self.baseAngle + angle
+		self.moveAngle = angle
 		self.setMagnitude(math.sqrt(self.velx**2 + self.vely**2))
 
 	def setMagnitude(self, magnitude):
-		self.velx = magnitude * math.cos(math.radians(self.artAngle))
-		self.vely = magnitude * math.sin(math.radians(self.artAngle))
+		self.velx = magnitude * math.cos(math.radians(self.moveAngle))
+		self.vely = magnitude * math.sin(math.radians(self.moveAngle))
 
 	def _collision(self, other):
 		if other.attributes.count("geometry") > 0 or isinstance(other, Actor):
