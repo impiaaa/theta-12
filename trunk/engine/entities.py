@@ -45,10 +45,12 @@ class Entity:
 		self.checkedCol = {}
 		self.disruptive = False # if this is false, fast-moving objects will know to go through this without stopping.
 		self.more_vx, self.more_vy = 0, 0
+		self.push_vx, self.push_vy = 0, 0 # not used for movement, just for tracking it
 		self.autoconform_geom = False # if true, the geometry of this object will automatically scale to the size of its graphics
 		self.mobile = True # set this to false if this object never moves, or it is moved by a parent object.
 		self.flags = {'push left':False, 'push right':False, 'push up':False, 'push down':False, 
 						'stay left':False, 'stay right':False, 'stay up':False, 'stay down':False} # these are reset every frame
+		self.was_grounded = False
 
 	def flag(self, key):
 		self.flags[key] = True
@@ -323,6 +325,7 @@ class Entity:
 
 		self._extraUpdate(self)
 
+		self.was_grounded = self.grounded
 		self.more_vx, self.more_vy = 0, 0
 		self.grounded = False # reset grounded
 		self.collidedWith = [] # clear list of things I collided with
@@ -399,7 +402,11 @@ class Block(FloorBlock):
 				other.geom.bottom = self.geom.top
 
 			if self.sticky:
-				other.more_vy = self.vely
+				other.push_vy = self.vely
+				if self.vely > 0:
+					other.more_vy = self.vely
+				if other.vely > 0:
+					other.vely = 0
 			else:
 				other.more_vy = 0
 				if (self.vely > other.vely and other.vely >= 0) or (self.vely < other.vely and self.vely < 0):
@@ -427,7 +434,11 @@ class Block(FloorBlock):
 			other.more_vx = self.velx
 
 			if self.sticky:
-				other.more_vy = self.vely
+				other.push_vy = self.vely
+				if self.vely > 0:
+					other.more_vy = self.vely
+				if other.vely > 0:
+					other.vely = 0
 			else:
 				other.more_vy = 0
 				if (self.vely > other.vely and other.vely >= 0) or (self.vely < other.vely and self.vely < 0):
@@ -456,7 +467,11 @@ class Block(FloorBlock):
 			other.lastFloor = self
 
 			if self.sticky:
-				other.more_vy = self.vely
+				other.push_vy = self.vely
+				if self.vely > 0:
+					other.more_vy = self.vely
+				if other.vely > 0:
+					other.vely = 0
 			else:
 				other.more_vy = 0
 				if (self.vely > other.vely and other.vely >= 0) or (self.vely < other.vely and self.vely < 0):
@@ -649,10 +664,14 @@ class Actor(Entity):
 
 		Entity.update(self, time)
 
+		if self.was_grounded and not self.grounded:
+			if self.vely > 0:
+				self.vely = 0
+
 	def jump(self):
 		self.vely = -math.sqrt(t12.gravity * self.jumpheight * 2)
 		self.geom.top -= 3
-		self.vely += self.more_vy
+		self.vely += self.push_vy
 		self.more_vy = 0
 
 	def left(self):
