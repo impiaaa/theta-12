@@ -215,6 +215,10 @@ def tload():
 	guy.geom.bottom = elevator.geom.top - 1
 	guy.autoconform_geom = True
 
+	fireballanim = graphwrap.AnimSprite()
+	fireseq = graphwrap.AnimSequence(["global/sprites/fire1.png", "global/sprites/fire2.png", "global/sprites/fire3.png"], 0.2, False)
+	fireballanim.runSequence(fireseq)
+
 	def guythink():
 		guy.lastThrow = 0
 		if guy.geom.centerx < t12.player.geom.centerx:
@@ -244,9 +248,7 @@ def tload():
 			tt = int(t12.game_time * 100)
 			if tt != guy.lastThrow and tt % 10 == 0:
 				guy.lastThrow = tt
-				meat = entities.DamageProjectile((0, 0, 1, 1),
-					graphwrap.staticSprite(pygame.transform.flip(
-						t12.imageLoader.getImage("global/sprites/animal_meat.png"), 1, 0)), 90, 1000, 1)
+				meat = entities.DamageProjectile((0, 0, 1, 1), fireballanim, 90, 500, 1)
 				meat.adjustGeomToImage()
 				meat.geom.center = guy.geom.center
 				meat.attributes.append("touch_player")
@@ -261,6 +263,6 @@ def tload():
 				
 	guy.think = guythink
 
-	#troom.add(guy)
+	troom.add(guy)
 
 tlevel.load = tload

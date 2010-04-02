@@ -72,6 +72,9 @@ class AnimSequence:
 		""" images are the individual frames, time is
 			 the duration of the entire sequence in seconds """
 		self.images = images
+		for i in range(len(self.images)):
+			if isinstance(self.images[i], str):
+				self.images[i] = t12.imageLoader.getImage(self.images[i])
 		self.__current_image_index = 0
 		self.duration = time
 		self.__time_ellapsed = 0
@@ -92,7 +95,7 @@ class AnimSequence:
 		i = self.__current_image_index + 1
 		if i >= len(self.images):
 			i = 0
-			loops += 1
+			self.loops += 1
 		self.__current_image_index = i
 		return self.images[i]
 
