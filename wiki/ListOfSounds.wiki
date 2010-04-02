@@ -1,6 +1,7 @@
 #labels Phase-Implementation
 = Notes =
  * We will not use sounds downloaded from the Internet unless necessary and only if they use a compatible license.
+   * It is necessary. We only have two months left.
  * If you would like to work on something listed here that you think will take a long time, write your name next to the item.
  * Please edit and add to this list!
 
