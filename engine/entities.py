@@ -47,6 +47,13 @@ class Entity:
 		self.more_vx, self.more_vy = 0, 0
 		self.autoconform_geom = False # if true, the geometry of this object will automatically scale to the size of its graphics
 		self.mobile = True # set this to false if this object never moves, or it is moved by a parent object.
+		self.flags = {'push left':False, 'push right':False, 'push up':False, 'push down':False, 
+						'stay left':False, 'stay right':False, 'stay up':False, 'stay down':False} # these are reset every frame
+
+	def flag(self, key):
+		self.flags[key] = True
+	def unflag(self, key):
+		self.flags[key] = False
 
 	def closest(self, ents):
 		""" returns the entity which is closest to me """
@@ -319,6 +326,8 @@ class Entity:
 		self.more_vx, self.more_vy = 0, 0
 		self.grounded = False # reset grounded
 		self.collidedWith = [] # clear list of things I collided with
+		for k in self.flags:
+			self.flags[k] = False
 
 	def _extraUpdate(self, par=None):
 		return None
@@ -396,8 +405,8 @@ class Block(FloorBlock):
 				if (self.vely > other.vely and other.vely >= 0) or (self.vely < other.vely and self.vely < 0):
 					other.vely = self.vely
 
-			#if other is t12.player and self.name == "Elevator Roof":
-			#	print "first", t12.game_time, self.vely, other.vely, other.more_vy, self.sticky
+			if self.vely < 0: other.flag('push up')
+			else: other.flag('stay up')
 
 			return
 
@@ -424,17 +433,23 @@ class Block(FloorBlock):
 				if (self.vely > other.vely and other.vely >= 0) or (self.vely < other.vely and self.vely < 0):
 					other.vely = self.vely
 
-			#if other is t12.player and self.name == "Elevator Roof":
-			#	print "second", t12.game_time, self.vely, other.vely, other.more_vy, self.sticky
+			if self.vely < 0: other.flag('push up')
+			else: other.flag('stay up')
 		elif wleft and not left:
 			other.geom.right = self.geom.left
 			other.velx = self.velx
+			if self.velx < 0: other.flag('push left')
+			else: other.flag('stay left')
 		elif wright and not right:
 			other.geom.left = self.geom.right
 			other.velx = self.velx
+			if self.velx > 0: other.flag('push right')
+			else: other.flag('stay right')
 		elif wbelow and not below or not (abs(other.geom.bottom - self.geom.top) < abs(self.geom.bottom - other.geom.top)):
 			other.geom.top = self.geom.bottom
 			other.vely = self.vely
+			if self.vely > 0: other.flag('push down')
+			else: other.flag('stay down')
 		elif not above:
 			other.geom.bottom = self.geom.top
 			other.grounded = True
@@ -447,8 +462,8 @@ class Block(FloorBlock):
 				if (self.vely > other.vely and other.vely >= 0) or (self.vely < other.vely and self.vely < 0):
 					other.vely = self.vely
 
-			#if other is t12.player and self.name == "Elevator Roof":
-			#	print "third", t12.game_time, self.vely, other.vely, other.more_vy, self.sticky
+			if self.vely < 0: other.flag('push up')
+			else: other.flag('stay up')
 
 		if self.sticky and (other.vely + other.more_vy) < self.vely:
 			other.vely = 0
@@ -618,8 +633,20 @@ class Actor(Entity):
 	def think(self):
 		return None
 
+	def _isSquashed(self):
+		flags = self.flags # convenience
+		if flags['push up'] and (flags['push down'] or flags['stay down']): return True
+		if flags['push down'] and flags['stay up']: return True
+		if flags['push left'] and (flags['push right'] or flags['stay right']): return True
+		if flags['push right'] and flags['stay left']: return True
+		return False
+
 	def update(self, time):
 		self.think()
+
+		if self._isSquashed():
+			print self.name + " was just squashed."
+
 		Entity.update(self, time)
 
 	def jump(self):
