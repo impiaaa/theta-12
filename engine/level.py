@@ -74,7 +74,12 @@ class Room:
 			self.art_mid.append(entity)
 		
 
-
+	def intersects(self, entity):
+		""" Returns true if the given rectangle intersects any of the geometry. """
+		for e in self.geometry:
+			if e.intersects(entity):
+				return True
+		return False
 
 class Level:
 	""" this should just be a list of rooms and maybe meta-data on how they attach to each other.
@@ -229,15 +234,33 @@ def tload():
 			if guy.anim.seq_name == "right punch": guy.anim.runSequence("left punch")
 
 		if guy.geom.left > t12.player.geom.right+50:
+			tinc = -int(guy.speed * t12.seconds_passed)
+			if t12.seconds_passed <= 0 or abs(t12.seconds_passed) > 5:
+				tinc = 0
+
+			guy.geom.x += tinc
+			if not troom.intersects(guy) and guy.grounded:
+				guy.jumpheight = 5
+				guy.jump()
 			guy.left()
 			guy.anim.runSequence("left")
+			guy.geom.centerx -= tinc
 		elif guy.geom.right < t12.player.geom.left-50:
+			tinc = -int(guy.speed * t12.seconds_passed)
+			if t12.seconds_passed <= 0 or abs(t12.seconds_passed) > 5:
+				tinc = 0
+			guy.geom.x += tinc
+			if not troom.intersects(guy) and guy.grounded:
+				guy.jumpheight = 5
+				guy.jump()
 			guy.right()
 			guy.anim.runSequence("right")
+			guy.geom.x -= tinc
 		else:
 			guy.velx = 0
 
 		if guy.geom.bottom > t12.player.geom.bottom and guy.grounded:
+			guy.jumpheight = max(5, guy.geom.bottom - t12.player.geom.bottom)
 			guy.jump()
 			if guy.anim.seq_name == "left punch": guy.anim.runSequence("left")
 			elif guy.anim.seq_name == "right punch": guy.anim.runSequence("right")
@@ -248,20 +271,29 @@ def tload():
 			tt = int(t12.game_time * 100)
 			if tt != guy.lastThrow and tt % 10 == 0:
 				guy.lastThrow = tt
-				meat = entities.DamageProjectile((0, 0, 1, 1), fireballanim, 90, 500, 1)
-				meat.adjustGeomToImage()
-				meat.geom.center = guy.geom.center
-				meat.attributes.append("touch_player")
-				meat.name = "Doom"
-				if guy.anim.seq_name == "left punch": meat.setAngle(180)
-				elif guy.anim.seq_name == "right punch": meat.setAngle(0)
-				guy.spawn.append(meat)
+				if guy.anim.seq_name == "left punch":
+					guy.attack(t12.dir_left)
+				elif guy.anim.seq_name == "right punch":
+					guy.attack(t12.dir_right)
+				
 		else:
 			if guy.anim.seq_name == "left punch": guy.anim.runSequence("left")
 			elif guy.anim.seq_name == "right punch": guy.anim.runSequence("right")
 				
-				
+
+	def guyattack(dire):
+		meat = entities.DamageProjectile((0, 0, 1, 1), fireballanim, 90, 500, 1)
+		meat.adjustGeomToImage()
+		meat.geom.center = guy.geom.center
+		meat.attributes.append("touch_player")
+		meat.name = "Doom"
+		if dire == t12.dir_left: meat.setAngle(180)
+		elif dire == t12.dir_right: meat.setAngle(0)
+		guy.spawn.append(meat)
+
+
 	guy.think = guythink
+	guy.attack = guyattack
 
 	troom.add(guy)
 
