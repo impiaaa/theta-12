@@ -279,6 +279,7 @@ class Entity:
 				z = artist.drawImage(image=m, pos=mrect, angle=self.artAngle)
 				rect = (mrect[0], mrect[1], z.get_width(), z.get_height())
 				artist.addDirtyRect(rect)
+			#artist.drawRect(rect[0:2], rect[2:4])
 		
 		artist.addDirtyRect(self.geom)
 		artist.addDirtyRect(self.last)
@@ -292,6 +293,11 @@ class Entity:
 		self.last.y = self.geom.y
 		self.last.width = self.geom.width
 		self.last.height = self.geom.height
+
+	def goNextPos(self):
+		self._updateMovement(self, t12.seconds_passed)
+	def goPrevPos(self):
+		self._updateMovement(self, -t12.seconds_passed)
 
 	def _updateMovement(self, time):
 		self.velx += self.acx * time
@@ -571,6 +577,7 @@ class Elevator(Entity):
 		self.y2 = targety
 		self.state = 0 # 0 = stopped, 1 = go towards position 1, -1 = go towards position 0
 		self.duration = duration
+		self.disruptive = False
 		if self.y2 - self.y1 > 0:
 			self.dir = 1
 		else:
@@ -645,6 +652,11 @@ class Actor(Entity):
 		self.update(0) # for the feetbox
 		self.think() # for AI
 
+	def attack(self, direction, target=None):
+		""" Direction is an integer. see t12.dir_up, t12.dir_left, et cetera """
+		return None
+
+
 	def think(self):
 		return None
 
@@ -675,9 +687,11 @@ class Actor(Entity):
 		self.more_vy = 0
 
 	def left(self):
+		if self.anim != None: self.anim.runSequence("go left", "left")
 		self.velx = max(-self.speed, self.velx - self.acceleration)
 
 	def right(self):
+		if self.anim != None: self.anim.runSequence("go right", "right")
 		self.velx = min(self.speed, self.velx + self.acceleration)
 
 	def stopX(self):
@@ -721,7 +735,7 @@ class Projectile(Entity):
 		self.vely = magnitude * math.sin(math.radians(self.moveAngle))
 
 	def _collision(self, other):
-		if other.attributes.count("geometry") > 0 or isinstance(other, Actor):
+		if (other.disruptive and other.attributes.count("geometry") > 0) or isinstance(other, Actor):
 			self.anim.runSequence("hit")
 			self.flagForRemoval = True
 			return True
@@ -736,6 +750,7 @@ class DamageProjectile(Projectile):
 		Entity.finalizeCollision(self)
 
 	def _collision(self, other):
+		#print self.name, "hit", other.name
 		if not Projectile._collision(self, other): return
 		if isinstance(other, Actor):
 			other.health -= self.damage

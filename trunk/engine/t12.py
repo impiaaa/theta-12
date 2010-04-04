@@ -10,4 +10,13 @@ camy = 0 # vertical camera offset to be reset each time a room is loaded.
 seconds_passed = 0 # time passed in the last frame
 game_time = 0 # seconds passed during the whole game
 
+dir_up = 1
+dir_down = 10
+dir_left = 2
+dir_right = 20
+dir_upleft = dir_up + dir_left
+dir_downleft = dir_down + dir_left
+dir_upright = dir_up + dir_right
+dir_downright = dir_down + dir_right
+
 flags = {"input left": False, "input right": False}

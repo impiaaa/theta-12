@@ -41,8 +41,9 @@ class AnimSprite:
 	def putSequence(self, key, sequence):
 		self.sequences[key] = sequence
 
-	def runSequence(self, seq):
-		""" The paramater can be either a sequence id or an AnimSequence object. """
+	def runSequence(self, seq, backup=None):
+		""" The paramater can be either a sequence id or an AnimSequence object.
+			The backup will be tried if seq is a string, and this sprite does not have it. """
 		if seq == None: return
 
 		if isinstance(seq, int):
@@ -51,6 +52,8 @@ class AnimSprite:
 			if self.sequences.has_key(seq):
 				self.current_seq = self.sequences[seq]
 				self.seq_name = seq
+			elif backup != None:
+				self.runSequence(backup) # yay recursion!
 		else:
 			self.current_seq = seq.clone()
 
