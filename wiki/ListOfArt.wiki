@@ -1,9 +1,12 @@
 #labels Phase-Implementation
 = Notes =
  * The scale for the art is 1 pixel = 2 inches.
+ * All tiles should be 32*32px
  * Make sure the edges of your artwork come up to the border of the image. The velociraptor is currently "floating" a couple pixels above the ground because the image height is a bit bigger than the actual image content.
  * If you would like to work on something listed here that you think will take a long time, write your name next to the item.
  * Please edit and add to this list!
+ * Please keep a consistent style. Use the "box" and "barrel" sprites for an idea of what I'm looking for.
+ * Here is the layout of our first level, to give you an idea: http://abpotato.com/files/trusted/levels.zip You can also use this for scale (1 grid space = 16px), but the real-world scale takes precedence.
 
 = Global =
  * Medkit (meat?)
@@ -11,6 +14,11 @@
  * Sky tiles
  * Ammo packs
  * Damage indicator (preferably not blood)
+ * Gate
+ * Door
+ * "Broken" floor tile template
+ * Shield
+ * Spikes
 
 = 1. Laboratory =
 == Characters ==
@@ -21,6 +29,10 @@
  * "Teen" velociraptor
  * Cloning vat (semi-transparent!)
  * Broken vat
+ * Spotlight
+ * Ceiling light
+ * Cables and broken cables
+ * Signs
 == Tiles ==
  * Metal floor tiles
  * Lab background
