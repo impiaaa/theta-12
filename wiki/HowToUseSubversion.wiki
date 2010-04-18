@@ -9,6 +9,8 @@ Next, type in the command and password given to you [http://code.google.com/p/th
 This will create the project directory. All of the commands below need to be executed inside the project directory, so:
 {{{cd theta-12}}}
 
+If the svn command fails, you'll need to install Subversion. It should be available in most Linux package repositories, and Mac users can eiter download a binary [[http://subversion.apache.org/packages.html here]] or run the developer tools installer from your system install disk. Once you've installed it, run the above commands again.
+
 == Updating to last revision ==
 Do this every so often (especially before editing) to make sure you have the most recent version of the code.
 {{{svn up}}}
