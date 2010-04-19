@@ -100,26 +100,26 @@ def main():
 			if event.type == pygame.QUIT:
 				return
 			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_LEFT:
+				if event.key == pygame.K_a:
 					t12.player.attack(t12.dir_left)
-				elif event.key == pygame.K_RIGHT:
+				elif event.key == pygame.K_d:
 					t12.player.attack(t12.dir_right)
-				elif event.key == pygame.K_UP:
+				elif event.key == pygame.K_w:
 					t12.player.attack(t12.dir_up)
-				elif event.key == pygame.K_DOWN:
+				elif event.key == pygame.K_s:
 					t12.player.attack(t12.dir_down)
 				elif event.key == pygame.K_SPACE or event.key == pygame.K_e:
 					activating = True
-				elif event.key == pygame.K_w:
+				elif event.key == pygame.K_UP:
 					if t12.player.grounded:
 						t12.player.jump()
-				elif event.key == pygame.K_s:
+				elif event.key == pygame.K_DOWN:
 					t12.player.decelerate(0, 5)
-				elif event.key == pygame.K_a:
+				elif event.key == pygame.K_LEFT:
 					t12.flags["input left"] = True
 					t12.flags["input right"] = False
 					#t12.player.anim.runSequence("left")
-				elif event.key == pygame.K_d:
+				elif event.key == pygame.K_RIGHT:
 					t12.flags["input right"] = True
 					t12.flags["input left"] = False
 					#t12.player.anim.runSequence("right")
@@ -128,6 +128,9 @@ def main():
 				elif event.key == pygame.K_c:
 					t12.player.geom.center = (200, 100)
 					t12.player.velx, t12.player.vely = 0, 0
+				elif event.key == K_ESCAPE:
+                                        pygame.quit()
+                                        sys.exit()
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_a and t12.player.velx < 0:
 					t12.flags["input left"] = False
