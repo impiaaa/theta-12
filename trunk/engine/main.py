@@ -115,11 +115,11 @@ def main():
 						t12.player.jump()
 				elif event.key == pygame.K_DOWN:
 					t12.player.decelerate(0, 5)
-				elif event.key == pygame.K_LEFT:
+				elif event.key == K_LEFT:
 					t12.flags["input left"] = True
 					t12.flags["input right"] = False
 					#t12.player.anim.runSequence("left")
-				elif event.key == pygame.K_RIGHT:
+				elif event.key == K_RIGHT:
 					t12.flags["input right"] = True
 					t12.flags["input left"] = False
 					#t12.player.anim.runSequence("right")
@@ -132,10 +132,10 @@ def main():
                                         pygame.quit()
                                         sys.exit()
 			if event.type == pygame.KEYUP:
-				if event.key == pygame.K_a and t12.player.velx < 0:
+				if event.key == K_LEFT and t12.player.velx < 0:
 					t12.flags["input left"] = False
 					#t12.player.velx = 0
-				elif event.key == pygame.K_d and t12.player.velx > 0:
+				elif event.key == K_RIGHT and t12.player.velx > 0:
 					t12.flags["input right"] = False
 					#t12.player.velx = 0
 				elif event.key == pygame.K_SPACE or event.key == pygame.K_e:
@@ -145,9 +145,9 @@ def main():
 		t12.player.decelerate(5000*seconds, 0) # this is really high because low decelerations make it hard.
 
 		# make input mac-friendly
-		if not pygame.key.get_pressed()[pygame.K_a]:
+		if not pygame.key.get_pressed()[pygame.K_LEFT]:
 			t12.flags["input left"] = False
-		if not pygame.key.get_pressed()[pygame.K_d]:
+		if not pygame.key.get_pressed()[pygame.K_RIGHT]:
 			t12.flags["input right"] = False
 		if t12.flags["input left"]: 
 			t12.player.left()
