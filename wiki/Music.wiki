@@ -1,0 +1,12 @@
+#summary A list of music tracks we need for the game.
+#labels Phase-Design
+This is a guideline for anybody composing music for the game.
+ * *Main menu/theme* - should sound heroic, cinematic, like an action/adventure movie
+ * *Labratory* - should be eerie, quiet, sci-fi, have lots of mechanical ambience
+ * *Jungle* - should sound primitive, cinematic, have lots of drums and maybe flutes, also lots of jungle ambience
+ * *Pirates* - should be pirate-y!
+ * *Ninjas* - should sound oriental
+ * *Zombies* - should be like a horror flick soundtrack
+ * *Robots* - should be techno, maybe sound like action, horror
+ * *Final battle* - epic, cinematic
+ * *Credits* - the only requirement here is that it should be awesome
