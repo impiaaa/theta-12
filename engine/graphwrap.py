@@ -71,9 +71,11 @@ class AnimSprite:
 
 
 class AnimSequence:
-	def __init__(self, images, time, makeId=True):
+	def __init__(self, images, time, makeId=True, flipx=False, flipy=False, looping=False):
 		""" images are the individual frames, time is
 			 the duration of the entire sequence in seconds """
+		self.looping = looping
+		self.flipx, self.flipy = flipx, flipy
 		self.images = images
 		for i in range(len(self.images)):
 			if isinstance(self.images[i], str):
@@ -92,15 +94,25 @@ class AnimSequence:
 	
 
 	def currentImage(self):
-		return self.images[self.__current_image_index]
+		m = self.images[self.__current_image_index]
+		if not self.flipx and not self.flipy:
+			return m
+		if self.flipx:
+			m = pygame.transform.flip(m, 1, 0)
+		if self.flipy:
+			m = pygame.transform.flip(m, 0, 1)
+		return m
 
 	def nextImage(self):
 		i = self.__current_image_index + 1
 		if i >= len(self.images):
-			i = 0
-			self.loops += 1
+			if self.looping:
+				i = 0
+				self.loops += 1
+			else:
+				i = len(self.images)-1
 		self.__current_image_index = i
-		return self.images[i]
+		return self.currentImage(self)
 
 	def updateImage(self, secs_passed):
 		if self.duration == -1:
