@@ -1,21 +1,28 @@
-import xml.dom.mindom
+import xml.dom.minidom
 import graphwrap
+import os.path
+import t12
 
 def load(fname):
-	doc = xml.dom.minidom.parse(fname)
-	spritelist = self.doc.getElementsByNodeName("spritelist")
-	relative = bool(int(spritelist.attributes["relative"].value))
-	for sprite in spritelist.getElementsByNodeName("sprite"):
-		name = sprite.attributes["name"].value
-		default = sprite.attributes["default"].value
-		for sequence in sprite.getElementsByNodeName("sequence"):
-			duration = float(sequence.attributes["duration"].value)
-			name = sequence.attributes["name"].value
-			attrs
-
-# note to spencer:
-# 	if the spritelist.relative="1", the path should be converted to an absolute path.
-#	If a spritelist is relative, the paths are relative to the directory the .xml file is in.
-
-def create_seq(framepaths, duration, looping, flipx, flipy):
-	return graphwrap.AnimSequence(framepaths, duration, False, flipx, flipy, looping)
+    if not hasattr(t12, "sprites"): t12.sprites = {}
+    doc = xml.dom.minidom.parse(fname)
+    spritelist = self.doc.getElementsByTagName("spritelist")
+    relative = bool(int(spritelist.getAttribute("relative").value))
+    for spriteNode in spritelist.getElementsByTagName("sprite"):
+        sprite = graphwrap.AnimSprite()
+        sprName = spriteNode.getAttribute("name")
+        defaultSeq = spriteNode.getAttribute("default")
+        for sequenceNode in spriteNode.getElementsByTagName("sequence"):
+            duration = float(sequenceNode.getAttribute("duration"))
+            seqName = sequenceNode.getAttribute("name")
+            flipx, flipy = bool(int(sequenceNode.getAttribute("flipx"))),\
+                           bool(int(sequenceNode.getAttribute("flipy")))
+            loop = bool(int(sequenceNode.getAttribute("loop")))
+            frames = [node.firstChild.data for node in sequenceNode.getElementsByTagName("frame")]
+            # I like list comprehensions :-)
+            if relative:
+                base = os.path.split(fname)[0]
+                frames = [os.path.normpath(os.path.join(f, base)) for f in frames]
+            sprite.putSequence(seqName, graphwrap.AnimSequence(frames, duration, False, flipx, flipy, loop))
+        sprite.runSequence(defaultSeq)
+        t12.sprites[sprName] = sprite
