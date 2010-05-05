@@ -1,4 +1,4 @@
-import entities, graphwrap, t12, pygame
+import entities, graphwrap, t12, pygame, spriteloader
 
 # this is just a basic template for now and will likely be expanded upon.
 
@@ -99,6 +99,8 @@ class Level:
 tlevel = Level()
 
 def tload():
+	spriteloader.load("../global.xml")
+
 	troom = tlevel.croom
 
 	button_anim = graphwrap.AnimSprite()
@@ -201,16 +203,7 @@ def tload():
 	troom.add(shifter2)
 	troom.add(entities.Block((shifter.geom.left - 1100, -580, 100, 20), None))
 
-	guyanim = graphwrap.AnimSprite()
-	guyanim.putSequence("right", graphwrap.staticSequence(
-						t12.imageLoader.getImage("global/sprites/person_stand.png")))
-	guyanim.putSequence("left", graphwrap.staticSequence(
-						pygame.transform.flip(t12.imageLoader.getImage("global/sprites/person_stand.png"), 1, 0)))
-	guyanim.putSequence("right punch", graphwrap.staticSequence(
-						t12.imageLoader.getImage("global/sprites/person_punch.png")))
-	guyanim.putSequence("left punch", graphwrap.staticSequence(
-						pygame.transform.flip(t12.imageLoader.getImage("global/sprites/person_punch.png"), 1, 0)))
-	guyanim.runSequence("left")
+	guyanim = t12.sprites["Garrett"]
 	guy = entities.Actor((0, 0, 1, 1), guyanim)
 	guy.name = "Guy"
 	guy.jumpheight = 300
