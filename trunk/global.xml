@@ -181,4 +181,12 @@
 			<frame>global/sprites/VelociraptorRobot.png</frame>
 		</sequence>
 	</sprite>
+	<sprite name="Forcefield" default="">
+		<sequence duration="0.4" name="Normal" flipx="0" flipy="0" loop="1">
+			<frame>global/sprites/Forcefield2.png</frame>
+			<frame>global/sprites/Forcefield2.png</frame>
+			<frame>global/sprites/Forcefield3.png</frame>
+			<frame>global/sprites/Forcefield1.png</frame>
+		</sequence>
+	</sprite>
 </spritelist>
