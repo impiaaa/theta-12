@@ -1,3 +1,5 @@
+import os, sys
+
 player = None
 current_level = None
 imageLoader = None
@@ -21,3 +23,6 @@ dir_upright = dir_up + dir_right
 dir_downright = dir_down + dir_right
 
 flags = {"input left": False, "input right": False}
+
+def fullPath(path):
+	return os.path.join(os.path.normpath(sys.path[0]+'/..'), path)
