@@ -99,7 +99,7 @@ class Level:
 tlevel = Level()
 
 def tload():
-	spriteloader.load("../global.xml")
+	spriteloader.load(t12.fullPath("global.xml"))
 
 	troom = tlevel.croom
 

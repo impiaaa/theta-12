@@ -6,8 +6,8 @@ import t12
 def load(fname):
     if not hasattr(t12, "sprites"): t12.sprites = {}
     doc = xml.dom.minidom.parse(fname)
-    spritelist = doc.getElementsByTagName("spritelist")
-    relative = bool(int(spritelist.getAttribute("relative").value))
+    spritelist = doc.getElementsByTagName("spritelist")[0]
+    relative = bool(int(spritelist.getAttribute("relative")))
     for spriteNode in spritelist.getElementsByTagName("sprite"):
         sprite = graphwrap.AnimSprite()
         sprName = spriteNode.getAttribute("name")

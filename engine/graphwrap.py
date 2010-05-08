@@ -1,6 +1,5 @@
 import pygame
 from pygame.locals import *
-import os
 import t12
 
 class ImageLoader:
@@ -12,7 +11,7 @@ class ImageLoader:
 		""" File format should be in the form globals/sprites/foo.png or whatever.
 			if reload is true, then the image is reloaded regardless of whether it is
 			already in the dictionary. """
-		path = os.path.join("..", path) # main theta-12 directory is root
+		path = t12.fullPath(path)
 		if reload or not self.loaded_images.has_key(path):
 			image = pygame.image.load(path).convert_alpha()
 			self.loaded_images[path] = image
@@ -48,7 +47,7 @@ class AnimSprite:
 
 		if isinstance(seq, int):
 			self.current_seq = t12.anim_sequences[seq].clone()
-		elif isinstance(seq, str):
+		elif isinstance(seq, basestring):
 			if self.sequences.has_key(seq):
 				self.current_seq = self.sequences[seq]
 				self.seq_name = seq
