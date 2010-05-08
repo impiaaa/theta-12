@@ -51,9 +51,12 @@ class AnimSprite:
 			if self.sequences.has_key(seq):
 				self.current_seq = self.sequences[seq]
 				self.seq_name = seq
+				print "Running", self.current_seq
 			elif backup != None:
+				print "No such sequence."
 				self.runSequence(backup) # yay recursion!
 		else:
+			print "Sequence:", seq
 			self.current_seq = seq.clone()
 
 		self.update(0) # update the current image
@@ -77,7 +80,8 @@ class AnimSequence:
 		self.flipx, self.flipy = flipx, flipy
 		self.images = images
 		for i in range(len(self.images)):
-			if isinstance(self.images[i], str):
+			if isinstance(self.images[i], basestring):
+				print "Loading", self.images[i]
 				self.images[i] = t12.imageLoader.getImage(self.images[i])
 		self.__current_image_index = 0
 		self.duration = time
