@@ -1,212 +1,212 @@
-<spritelist relative="0">
+<spritelist relative="1">
 	<sprite name="Compsognathus" default="left">
 		<sequence duration="0.7" name="walk right" flipx="1" flipy="0" loop="1">
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f7.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f8.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f9.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f10.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f11.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f1.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f2.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f3.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f4.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f5.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f6.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f12.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f7.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f8.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f9.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f10.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f11.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f1.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f2.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f3.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f4.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f5.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f6.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f12.png</frame>
 		</sequence>
 		<sequence duration="0.3" name="jump right" flipx="1" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/Compsognathusf1.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus Jump f2.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus Jump f3.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus Jump f4.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus Jump f5.png</frame>
+			<frame>global/sprites/Compsognathusf1.png</frame>
+			<frame>global/sprites/Compsognathus Jump f2.png</frame>
+			<frame>global/sprites/Compsognathus Jump f3.png</frame>
+			<frame>global/sprites/Compsognathus Jump f4.png</frame>
+			<frame>global/sprites/Compsognathus Jump f5.png</frame>
 		</sequence>
 		<sequence duration="0.2" name="bite right" flipx="1" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/Compsognathus_Bite_f1.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Bite_f2.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Bite_f3.png</frame>
+			<frame>global/sprites/Compsognathus_Bite_f1.png</frame>
+			<frame>global/sprites/Compsognathus_Bite_f2.png</frame>
+			<frame>global/sprites/Compsognathus_Bite_f3.png</frame>
 		</sequence>
 		<sequence duration="1.0" name="right" flipx="1" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/Compsognathus.png</frame>
+			<frame>global/sprites/Compsognathus.png</frame>
 		</sequence>
 		<sequence duration="0.2" name="bite left" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/Compsognathus_Bite_f1.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Bite_f2.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Bite_f3.png</frame>
+			<frame>global/sprites/Compsognathus_Bite_f1.png</frame>
+			<frame>global/sprites/Compsognathus_Bite_f2.png</frame>
+			<frame>global/sprites/Compsognathus_Bite_f3.png</frame>
 		</sequence>
 		<sequence duration="0.7" name="walk left" flipx="0" flipy="0" loop="1">
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f1.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f2.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f3.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f4.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f5.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f6.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f7.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f8.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f9.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f10.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f11.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus_Walk_f12.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f1.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f2.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f3.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f4.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f5.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f6.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f7.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f8.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f9.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f10.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f11.png</frame>
+			<frame>global/sprites/Compsognathus_Walk_f12.png</frame>
 		</sequence>
 		<sequence duration="0.3" name="jump left" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/Compsognathusf1.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus Jump f2.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus Jump f3.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus Jump f4.png</frame>
-			<frame>/theta-12/global/sprites/Compsognathus Jump f5.png</frame>
+			<frame>global/sprites/Compsognathusf1.png</frame>
+			<frame>global/sprites/Compsognathus Jump f2.png</frame>
+			<frame>global/sprites/Compsognathus Jump f3.png</frame>
+			<frame>global/sprites/Compsognathus Jump f4.png</frame>
+			<frame>global/sprites/Compsognathus Jump f5.png</frame>
 		</sequence>
 		<sequence duration="1.0" name="left" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/Compsognathus.png</frame>
+			<frame>global/sprites/Compsognathus.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Fireball" default="straight">
 		<sequence duration="0.3" name="main" flipx="0" flipy="0" loop="1">
-			<frame>/theta-12/global/sprites/fire1.png</frame>
-			<frame>/theta-12/global/sprites/fire2.png</frame>
-			<frame>/theta-12/global/sprites/fire3.png</frame>
+			<frame>global/sprites/fire1.png</frame>
+			<frame>global/sprites/fire2.png</frame>
+			<frame>global/sprites/fire3.png</frame>
 		</sequence>
 		<sequence duration="0.4" name="clock" flipx="1" flipy="0" loop="1">
-			<frame>/theta-12/global/sprites/Fireball1.png</frame>
-			<frame>/theta-12/global/sprites/Fireball2.png</frame>
-			<frame>/theta-12/global/sprites/Fireball3.png</frame>
-			<frame>/theta-12/global/sprites/Fireball4.png</frame>
-			<frame>/theta-12/global/sprites/Fireball5.png</frame>
-			<frame>/theta-12/global/sprites/Fireball6.png</frame>
-			<frame>/theta-12/global/sprites/Fireball7.png</frame>
-			<frame>/theta-12/global/sprites/Fireball8.png</frame>
+			<frame>global/sprites/Fireball1.png</frame>
+			<frame>global/sprites/Fireball2.png</frame>
+			<frame>global/sprites/Fireball3.png</frame>
+			<frame>global/sprites/Fireball4.png</frame>
+			<frame>global/sprites/Fireball5.png</frame>
+			<frame>global/sprites/Fireball6.png</frame>
+			<frame>global/sprites/Fireball7.png</frame>
+			<frame>global/sprites/Fireball8.png</frame>
 		</sequence>
 		<sequence duration="0.4" name="counterclock" flipx="0" flipy="0" loop="1">
-			<frame>/theta-12/global/sprites/Fireball1.png</frame>
-			<frame>/theta-12/global/sprites/Fireball2.png</frame>
-			<frame>/theta-12/global/sprites/Fireball3.png</frame>
-			<frame>/theta-12/global/sprites/Fireball4.png</frame>
-			<frame>/theta-12/global/sprites/Fireball5.png</frame>
-			<frame>/theta-12/global/sprites/Fireball6.png</frame>
-			<frame>/theta-12/global/sprites/Fireball7.png</frame>
-			<frame>/theta-12/global/sprites/Fireball8.png</frame>
+			<frame>global/sprites/Fireball1.png</frame>
+			<frame>global/sprites/Fireball2.png</frame>
+			<frame>global/sprites/Fireball3.png</frame>
+			<frame>global/sprites/Fireball4.png</frame>
+			<frame>global/sprites/Fireball5.png</frame>
+			<frame>global/sprites/Fireball6.png</frame>
+			<frame>global/sprites/Fireball7.png</frame>
+			<frame>global/sprites/Fireball8.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Tall Button" default="off">
 		<sequence duration="1.0" name="on" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/button-pressed.png</frame>
+			<frame>global/sprites/button-pressed.png</frame>
 		</sequence>
 		<sequence duration="1.0" name="off" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/button.png</frame>
+			<frame>global/sprites/button.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Garrett" default="right">
 		<sequence duration="1.0" name="right" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/person_stand.png</frame>
+			<frame>global/sprites/person_stand.png</frame>
 		</sequence>
 		<sequence duration="1.0" name="punch right" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/person_punch.png</frame>
+			<frame>global/sprites/person_punch.png</frame>
 		</sequence>
 		<sequence duration="1.0" name="punch left" flipx="1" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/person_punch.png</frame>
+			<frame>global/sprites/person_punch.png</frame>
 		</sequence>
 		<sequence duration="1.0" name="left" flipx="1" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/person_stand.png</frame>
+			<frame>global/sprites/person_stand.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Velociraptor" default="right">
 		<sequence duration="1.0" name="right" flipx="1" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/Velociraptor2.png</frame>
+			<frame>global/sprites/Velociraptor2.png</frame>
 		</sequence>
 		<sequence duration="1.0" name="left" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/Velociraptor2.png</frame>
+			<frame>global/sprites/Velociraptor2.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Teleporter" default="off">
 		<sequence duration="1.0" name="on" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/Teleporter1.png</frame>
+			<frame>global/sprites/Teleporter1.png</frame>
 		</sequence>
 		<sequence duration="1.0" name="off" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/Teleporter0.png</frame>
+			<frame>global/sprites/Teleporter0.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Lantern" default="main">
 		<sequence duration="0.42857142857142855" name="main" flipx="0" flipy="0" loop="1">
-			<frame>/theta-12/global/sprites/Lantern_f1.png</frame>
-			<frame>/theta-12/global/sprites/Lantern_f2.png</frame>
-			<frame>/theta-12/global/sprites/Lantern_f3.png</frame>
+			<frame>global/sprites/Lantern_f1.png</frame>
+			<frame>global/sprites/Lantern_f2.png</frame>
+			<frame>global/sprites/Lantern_f3.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Animal Meat" default="main">
 		<sequence duration="1.0" name="main" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/animal_meat.png</frame>
+			<frame>global/sprites/animal_meat.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Barrel" default="main">
 		<sequence duration="1.0" name="main" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/barrel.png</frame>
+			<frame>global/sprites/barrel.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Mini Box" default="main">
 		<sequence duration="1.0" name="main" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/box.png</frame>
+			<frame>global/sprites/box.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Raptor Egg" default="main">
 		<sequence duration="1.0" name="main" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/RaptorEgg.png</frame>
+			<frame>global/sprites/RaptorEgg.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Spotlight Holder" default="main">
 		<sequence duration="1.0" name="main" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/Spotlight Holder.png</frame>
+			<frame>global/sprites/Spotlight Holder.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Ceiling Light" default="main">
 		<sequence duration="1.0" name="main" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/Light1.png</frame>
+			<frame>global/sprites/Light1.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Velociraptor Pirate" default="left">
 		<sequence duration="1.0" name="right" flipx="1" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/VelociraptorPirate.png</frame>
+			<frame>global/sprites/VelociraptorPirate.png</frame>
 		</sequence>
 		<sequence duration="1.0" name="left" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/VelociraptorPirate.png</frame>
+			<frame>global/sprites/VelociraptorPirate.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Velociraptor Baby" default="left">
 		<sequence duration="1.0" name="right" flipx="1" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/VelociraptorBaby.png</frame>
+			<frame>global/sprites/VelociraptorBaby.png</frame>
 		</sequence>
 		<sequence duration="1.0" name="left" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/VelociraptorBaby.png</frame>
+			<frame>global/sprites/VelociraptorBaby.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Velociraptor Midage" default="left">
 		<sequence duration="1.0" name="right" flipx="1" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/VelociraptorMidage.png</frame>
+			<frame>global/sprites/VelociraptorMidage.png</frame>
 		</sequence>
 		<sequence duration="1.0" name="left" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/VelociraptorMidage.png</frame>
+			<frame>global/sprites/VelociraptorMidage.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Velociraptor Ninja" default="left">
 		<sequence duration="1.0" name="right" flipx="1" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/VelociraptorNinja.png</frame>
+			<frame>global/sprites/VelociraptorNinja.png</frame>
 		</sequence>
 		<sequence duration="1.0" name="left" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/VelociraptorNinja.png</frame>
+			<frame>global/sprites/VelociraptorNinja.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Velociraptor Robot" default="left">
 		<sequence duration="1.0" name="right" flipx="1" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/VelociraptorRobot.png</frame>
+			<frame>global/sprites/VelociraptorRobot.png</frame>
 		</sequence>
 		<sequence duration="1.0" name="left" flipx="0" flipy="0" loop="0">
-			<frame>/theta-12/global/sprites/VelociraptorRobot.png</frame>
+			<frame>global/sprites/VelociraptorRobot.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Forcefield" default="">
 		<sequence duration="0.4" name="Normal" flipx="0" flipy="0" loop="1">
-			<frame>/theta-12/global/sprites/Forcefield2.png</frame>
-			<frame>/theta-12/global/sprites/Forcefield2.png</frame>
-			<frame>/theta-12/global/sprites/Forcefield3.png</frame>
-			<frame>/theta-12/global/sprites/Forcefield1.png</frame>
+			<frame>global/sprites/Forcefield2.png</frame>
+			<frame>global/sprites/Forcefield2.png</frame>
+			<frame>global/sprites/Forcefield3.png</frame>
+			<frame>global/sprites/Forcefield1.png</frame>
 		</sequence>
 	</sprite>
 </spritelist>

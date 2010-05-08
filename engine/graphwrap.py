@@ -115,7 +115,7 @@ class AnimSequence:
 			else:
 				i = len(self.images)-1
 		self.__current_image_index = i
-		return self.currentImage(self)
+		return self.currentImage()
 
 	def updateImage(self, secs_passed):
 		if self.duration == -1:
