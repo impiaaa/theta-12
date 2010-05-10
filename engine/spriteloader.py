@@ -22,6 +22,8 @@ def load(fname):
 			# I like list comprehensions :-)
 			if relative:
 				frames = [t12.fullPath(f) for f in frames]
-			sprite.putSequence(seqName, graphwrap.AnimSequence(frames, duration, False, flipx, flipy, loop))
+			seq = graphwrap.AnimSequence(frames, duration, False, flipx, flipy, loop)
+			seq.name = seqName
+			sprite.putSequence(seqName, seq)
 		sprite.runSequence(defaultSeq)
 		t12.sprites[sprName] = sprite

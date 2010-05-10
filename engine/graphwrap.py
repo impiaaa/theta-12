@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 import t12
+import os
 
 class ImageLoader:
 	def __init__(self):
@@ -12,10 +13,36 @@ class ImageLoader:
 			if reload is true, then the image is reloaded regardless of whether it is
 			already in the dictionary. """
 		path = t12.fullPath(path)
-		if reload or not self.loaded_images.has_key(path):
+		if reload or not self.loaded_images.has_key(path.lower()):
+			# this next block of code makes the image loader case-insensitive
+			if not os.path.exists(path):
+				opath = path
+				path = self._findUncase(path)
+				if path == None:
+					print "No such image (" + opath + ")"
+					return None
+
 			image = pygame.image.load(path).convert_alpha()
-			self.loaded_images[path] = image
-		return self.loaded_images[path]
+			self.loaded_images[path.lower()] = image
+		return self.loaded_images[path.lower()]
+
+	def _pathparts(self, path):
+		if path[-1] == os.path.sep:
+			path = path[:-1]
+		i = path.rindex(os.path.sep)
+		p = path[:i]
+		if len(p) == 0:
+			p = '.'
+		return (p, path[i+1:])
+
+	def _findUncase(self, path):
+		pdir, name = self._pathparts(path)
+		files = os.listdir(pdir)
+		name = name.lower()
+		for f in files:
+			if f.lower() == name:
+				return os.path.join(os.path.normpath(pdir), f)
+		return None
 
 	def empty(self):
 		self.loaded_images.clear()
@@ -51,12 +78,9 @@ class AnimSprite:
 			if self.sequences.has_key(seq):
 				self.current_seq = self.sequences[seq]
 				self.seq_name = seq
-				print "Running", self.current_seq
 			elif backup != None:
-				print "No such sequence."
 				self.runSequence(backup) # yay recursion!
 		else:
-			print "Sequence:", seq
 			self.current_seq = seq.clone()
 
 		self.update(0) # update the current image
@@ -81,11 +105,12 @@ class AnimSequence:
 		self.images = images
 		for i in range(len(self.images)):
 			if isinstance(self.images[i], basestring):
-				print "Loading", self.images[i]
+				#print "Loading", self.images[i]
 				self.images[i] = t12.imageLoader.getImage(self.images[i])
 		self.__current_image_index = 0
 		self.duration = time
 		self.__time_ellapsed = 0
+		self.name = "I have no name."
 		self.loops = 0 # number of loops completed so far
 		if makeId:
 			self.id = t12.seq_currentid
@@ -137,7 +162,7 @@ class AnimSequence:
 	def clone(self):
 		""" This is necessary because otherwise all sequences will be on the same frame, 
 			which would look weird. """
-		seq = AnimSequence(self.images, self.duration, False)
+		seq = AnimSequence(self.images, self.duration, False, self.flipx, self.flipy, self.looping)
 		return seq
 
 
