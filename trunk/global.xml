@@ -59,31 +59,33 @@
 			<frame>global/sprites/Compsognathus.png</frame>
 		</sequence>
 	</sprite>
-	<sprite name="Fireball" default="straight">
+	<sprite name="Firebolt" default="main">
 		<sequence duration="0.3" name="main" flipx="0" flipy="0" loop="1">
 			<frame>global/sprites/fire1.png</frame>
 			<frame>global/sprites/fire2.png</frame>
 			<frame>global/sprites/fire3.png</frame>
 		</sequence>
-		<sequence duration="0.4" name="clock" flipx="1" flipy="0" loop="1">
-			<frame>global/sprites/Fireball1.png</frame>
-			<frame>global/sprites/Fireball2.png</frame>
-			<frame>global/sprites/Fireball3.png</frame>
-			<frame>global/sprites/Fireball4.png</frame>
-			<frame>global/sprites/Fireball5.png</frame>
-			<frame>global/sprites/Fireball6.png</frame>
-			<frame>global/sprites/Fireball7.png</frame>
-			<frame>global/sprites/Fireball8.png</frame>
+	</sprite>
+	<sprite name="Fireball" default="clockwise">
+		<sequence duration="0.4" name="clockwise" flipx="1" flipy="0" loop="1">
+			<frame>global/sprites/fireball1.png</frame>
+			<frame>global/sprites/fireball2.png</frame>
+			<frame>global/sprites/fireball3.png</frame>
+			<frame>global/sprites/fireball4.png</frame>
+			<frame>global/sprites/fireball5.png</frame>
+			<frame>global/sprites/fireball6.png</frame>
+			<frame>global/sprites/fireball7.png</frame>
+			<frame>global/sprites/fireball8.png</frame>
 		</sequence>
 		<sequence duration="0.4" name="counterclock" flipx="0" flipy="0" loop="1">
-			<frame>global/sprites/Fireball1.png</frame>
-			<frame>global/sprites/Fireball2.png</frame>
-			<frame>global/sprites/Fireball3.png</frame>
-			<frame>global/sprites/Fireball4.png</frame>
-			<frame>global/sprites/Fireball5.png</frame>
-			<frame>global/sprites/Fireball6.png</frame>
-			<frame>global/sprites/Fireball7.png</frame>
-			<frame>global/sprites/Fireball8.png</frame>
+			<frame>global/sprites/fireball1.png</frame>
+			<frame>global/sprites/fireball2.png</frame>
+			<frame>global/sprites/fireball3.png</frame>
+			<frame>global/sprites/fireball4.png</frame>
+			<frame>global/sprites/fireball5.png</frame>
+			<frame>global/sprites/fireball6.png</frame>
+			<frame>global/sprites/fireball7.png</frame>
+			<frame>global/sprites/fireball8.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Tall Button" default="off">
@@ -203,10 +205,10 @@
 	</sprite>
 	<sprite name="Forcefield" default="">
 		<sequence duration="0.4" name="Normal" flipx="0" flipy="0" loop="1">
-			<frame>global/sprites/Forcefield2.png</frame>
-			<frame>global/sprites/Forcefield2.png</frame>
-			<frame>global/sprites/Forcefield3.png</frame>
-			<frame>global/sprites/Forcefield1.png</frame>
+			<frame>global/sprites/forcefield2.png</frame>
+			<frame>global/sprites/forcefield2.png</frame>
+			<frame>global/sprites/forcefield3.png</frame>
+			<frame>global/sprites/forcefield1.png</frame>
 		</sequence>
 	</sprite>
 </spritelist>

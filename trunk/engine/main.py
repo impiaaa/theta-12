@@ -47,22 +47,12 @@ def main():
 	
 
 	clock = pygame.time.Clock()
-
-
-	#test code for loading velociraptor anim
-	an = graphwrap.AnimSprite()
-	an.putSequence("left", graphwrap.staticSequence(
-						t12.imageLoader.getImage("global/sprites/Velociraptor2.png")))
-	an.putSequence("right", graphwrap.staticSequence(
-						pygame.transform.flip(t12.imageLoader.getImage("global/sprites/Velociraptor2.png"), 1, 0)))
-	an.runSequence("left")
-	
 	
 	t12.current_level = level.tlevel
 	t12.current_level.load()
 	croom = t12.current_level.croom
 
-	t12.player = entities.Actor((420.0, 100.0, 30.0, 20.0), an)
+	t12.player = entities.Actor((420.0, 100.0, 30.0, 20.0), t12.sprites["Velociraptor"])
 	t12.player.name = "player"
 	t12.player.jumpheight = 72 # wikianswers says this number should be 72, but that is boring.
 	t12.player.speed = 396 # 396 in/2s according to wikianswers

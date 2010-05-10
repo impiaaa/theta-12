@@ -103,14 +103,9 @@ def tload():
 
 	troom = tlevel.croom
 
-	button_anim = graphwrap.AnimSprite()
-	button_anim.putSequence("unpressed", graphwrap.staticSequence(t12.imageLoader.getImage("global/sprites/button.png")))
-	button_anim.putSequence("pressed", graphwrap.staticSequence(t12.imageLoader.getImage("global/sprites/button-pressed.png")))
-	button_anim.runSequence("unpressed")
-
-	trig = entities.Activator((200, 350, 50, 50), button_anim) # this trigger has its .anim set to None, 
+	trig = entities.Activator((200, 350, 50, 50), t12.sprites["Tall Button"]) # this trigger has its .anim set to None, 
 															# but most motion triggers will probably be invisible (-1)
-	trig2 = entities.Activator((325, 350, 50, 50), button_anim)
+	trig2 = entities.Activator((325, 350, 50, 50), t12.sprites["Tall Button"])
 	trig3 = entities.MotionTrigger((-1000, 1000, 30000, 100), -1)
 	trig3.name = "Steve"
 
@@ -135,12 +130,12 @@ def tload():
 	fblock.name = "Block"
 	def reactor(par=None):
 		fblock.geom.centerx = trig.geom.centerx
-		trig.anim.runSequence("pressed")
-		trig2.anim.runSequence("unpressed")
+		trig.anim.runSequence("on")
+		trig2.anim.runSequence("off")
 	def reactor2(par=None):
 		fblock.geom.centerx = trig2.geom.centerx
-		trig2.anim.runSequence("pressed")
-		trig.anim.runSequence("unpressed")
+		trig2.anim.runSequence("on")
+		trig.anim.runSequence("off")
 	def react3(par=None):
 		if par != None and isinstance(par, entities.Actor):
 			if par.lastFloor == None:
@@ -213,18 +208,16 @@ def tload():
 	guy.geom.bottom = elevator.geom.top - 1
 	guy.autoconform_geom = True
 
-	fireballanim = graphwrap.AnimSprite()
-	fireseq = graphwrap.AnimSequence(["global/sprites/fire1.png", "global/sprites/fire2.png", "global/sprites/fire3.png"], 0.2, False)
-	fireballanim.runSequence(fireseq)
+	fireballanim = t12.sprites["Firebolt"]
 
 	def guythink():
 		guy.lastThrow = 0
 		if guy.geom.centerx < t12.player.geom.centerx:
 			if guy.anim.seq_name == "left": guy.anim.runSequence("right")
-			if guy.anim.seq_name == "left punch": guy.anim.runSequence("right punch")
+			if guy.anim.seq_name == "punch left": guy.anim.runSequence("punch right")
 		elif guy.geom.centerx > t12.player.geom.centerx:
 			if guy.anim.seq_name == "right": guy.anim.runSequence("left")
-			if guy.anim.seq_name == "right punch": guy.anim.runSequence("left punch")
+			if guy.anim.seq_name == "punch right": guy.anim.runSequence("punch left")
 
 		if guy.geom.left > t12.player.geom.right+50:
 			tinc = -int(guy.speed * t12.seconds_passed)
@@ -255,23 +248,23 @@ def tload():
 		if guy.geom.bottom > t12.player.geom.bottom and guy.grounded:
 			guy.jumpheight = max(5, guy.geom.bottom - t12.player.geom.bottom)
 			guy.jump()
-			if guy.anim.seq_name == "left punch": guy.anim.runSequence("left")
-			elif guy.anim.seq_name == "right punch": guy.anim.runSequence("right")
+			if guy.anim.seq_name == "punch left": guy.anim.runSequence("left")
+			elif guy.anim.seq_name == "punch right": guy.anim.runSequence("right")
 		elif t12.player.geom.bottom > guy.geom.bottom > t12.player.geom.top or t12.player.geom.bottom > guy.geom.top > t12.player.geom.top:
-			if guy.anim.seq_name == "left": guy.anim.runSequence("left punch")
-			elif guy.anim.seq_name == "right": guy.anim.runSequence("right punch")
+			if guy.anim.seq_name == "left": guy.anim.runSequence("punch left")
+			elif guy.anim.seq_name == "right": guy.anim.runSequence("punch right")
 
 			tt = int(t12.game_time * 100)
 			if tt != guy.lastThrow and tt % 10 == 0:
 				guy.lastThrow = tt
-				if guy.anim.seq_name == "left punch":
+				if guy.anim.seq_name == "punch left":
 					guy.attack(t12.dir_left)
-				elif guy.anim.seq_name == "right punch":
+				elif guy.anim.seq_name == "punch right":
 					guy.attack(t12.dir_right)
 				
 		else:
-			if guy.anim.seq_name == "left punch": guy.anim.runSequence("left")
-			elif guy.anim.seq_name == "right punch": guy.anim.runSequence("right")
+			if guy.anim.seq_name == "punch left": guy.anim.runSequence("left")
+			elif guy.anim.seq_name == "punch right": guy.anim.runSequence("right")
 				
 
 	def guyattack(dire):
