@@ -63,6 +63,7 @@ def main():
 
 	croom.add(t12.player)
 	t12.player.geom.center = croom.playerstart
+	t12.player.weapon = entities.FireballGun()
 	
 
 	firstframe = True
@@ -141,8 +142,10 @@ def main():
 			t12.flags["input right"] = False
 		if t12.flags["input left"]: 
 			t12.player.left()
-		if t12.flags["input right"]: 
+		elif t12.flags["input right"]: 
 			t12.player.right()
+		else:
+			t12.player.stopX()
 
 
 		# update movement/spawn things
