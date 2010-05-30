@@ -77,11 +77,12 @@ class AnimSprite:
 		elif isinstance(seq, basestring):
 			if self.sequences.has_key(seq):
 				self.current_seq = self.sequences[seq]
-				self.seq_name = seq
+				self.seq_name = self.current_seq.name
 			elif backup != None:
 				self.runSequence(backup) # yay recursion!
 		else:
 			self.current_seq = seq.clone()
+			self.seq_name = self.current_seq.name
 
 		self.update(0) # update the current image
 
@@ -163,6 +164,7 @@ class AnimSequence:
 		""" This is necessary because otherwise all sequences will be on the same frame, 
 			which would look weird. """
 		seq = AnimSequence(self.images, self.duration, False, self.flipx, self.flipy, self.looping)
+		seq.name = self.name
 		return seq
 
 

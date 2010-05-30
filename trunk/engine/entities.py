@@ -8,6 +8,21 @@ def entity_named(name):
 		if game_entities[i] == name:
 			return game_entities[i]
 
+class Weapon:
+	""" The Weapon is NOT an entity. """
+	def __init__(self):
+		self.name = "Untitled Weapon"
+		self.icon = None
+		self.graphic = None
+
+	def use(self, by, startpoint, tar_polar):
+		""" This doesn't do anything in the base Weapon class.
+		    	Subclasses should override it. 'by' should be whatever entity
+			fired the weapon. tar_ent is the target entity, tar_point is the
+			target point, tar_polar is as trajectory (angle and magnitude). startpoint
+			is a tuple, and it's purpose should be self-explanatory. """
+		return None
+
 class Entity:
 	def __init__(self, geom, anim):
 		""" geom should be a rectangle or a tuple in rectangle format: (x, y, w, h) or pygame.rect.Rect
@@ -642,6 +657,8 @@ class Actor(Entity):
 		self.attributes.append("art_front")
 		self.attributes.append("touch_geom")
 
+		self.weapon = None
+
 		self.health = 10 # arbitrary default
 		self.jumpheight = 50 # arbitrary
 		self.speed = 100 # maximum horizontal movement speed (pixels/second)
@@ -654,6 +671,16 @@ class Actor(Entity):
 
 	def attack(self, direction, target=None):
 		""" Direction is an integer. see t12.dir_up, t12.dir_left, et cetera """
+		if self.weapon != None:
+			if direction == t12.dir_up:
+				angle = 270
+			elif direction == t12.dir_down:
+				angle = 90
+			elif direction == t12.dir_left:
+				angle = 180
+			elif direction == t12.dir_right:
+				angle = 0
+			self.weapon.use(self, self.geom.center, (angle, 1000))
 		return None
 
 
@@ -696,6 +723,8 @@ class Actor(Entity):
 
 	def stopX(self):
 		self.velx = 0
+		if self.anim.seq_name == "go right": self.anim.runSequence("right")
+		if self.anim.seq_name == "go left": self.anim.runSequence("left")
 
 	def decelerate(self, x, y):
 		""" Decelerates in the given x/y directions. It will NOT
@@ -727,6 +756,7 @@ class Projectile(Entity):
 
 	def setAngle(self, angle):
 		self.artAngle = self.baseAngle + angle
+		if self.artAngle >= 360: self.artAngle = self.artAngle % 360
 		self.moveAngle = angle
 		self.setMagnitude(math.sqrt(self.velx**2 + self.vely**2))
 
@@ -745,6 +775,8 @@ class DamageProjectile(Projectile):
 	def __init__(self, geom, anim, angle, magnitude, damage):
 		Projectile.__init__(self, geom, anim, angle, magnitude)
 		self.damage = damage
+		self.ignorelist = [] # list of entities I can't hit
+		self.anim.current_seq.flipy = True
 
 	def finalizeCollision(self):
 		Entity.finalizeCollision(self)
@@ -752,5 +784,21 @@ class DamageProjectile(Projectile):
 	def _collision(self, other):
 		#print self.name, "hit", other.name
 		if not Projectile._collision(self, other): return
+		if self.ignorelist.count(other) > 0: return
 		if isinstance(other, Actor):
 			other.health -= self.damage
+
+class FireballGun(Weapon):
+	def __init__(self):
+		Weapon.__init__(self)
+		self.name = "Fireball Gun"
+
+	def use(self, by, startpoint, tar_polar):
+		ball = DamageProjectile((0, 0, 10, 1), t12.sprites["Firebolt"], 0, tar_polar[1], 1)
+		ball.setAngle(tar_polar[0])
+		ball.artAngle = tar_polar[0] + 270
+		ball.adjustGeomToImage()
+		ball.geom.center = startpoint
+		ball.attributes.append("touch_enemies")
+		ball.name = "FireballGun Fireball"
+		by.spawn.append(ball)
