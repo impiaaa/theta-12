@@ -238,4 +238,14 @@
 			<frame>global/sprites/blood14.png</frame>
 		</sequence>
 	</sprite>
+	<sprite name="Bullet 01" default="main">
+		<sequence duration="1.0" name="main" flipx="0" flipy="0" loop="0">
+			<frame>global/sprites/bullet01.png</frame>
+		</sequence>
+	</sprite>
+	<sprite name="Bullet 02" default="main">
+		<sequence duration="1.0" name="main" flipx="0" flipy="0" loop="0">
+			<frame>global/sprites/bullet02.png</frame>
+		</sequence>
+	</sprite>
 </spritelist>

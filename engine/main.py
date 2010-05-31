@@ -3,6 +3,7 @@ import pygame
 from pygame.locals import *
 import t12, physics, entities, graphwrap, level
 import time
+import inventory
 
 # helper functions
 def empty(stuff):
@@ -58,20 +59,28 @@ def main():
 	t12.player.name = "player"
 	t12.player.jumpheight = 72 # wikianswers says this number should be 72, but that is boring.
 	t12.player.speed = 396 # 396 in/2s according to wikianswers
-
+	t12.player.setHealth(30)
+	t12.player.showhealthbar = False
+	
 	t12.player.adjustGeomToImage()
 	t12.player.stretchArt = False
 	t12.player.geom.width = 20 # testing things
 
 	croom.add(t12.player)
 	t12.player.geom.center = croom.playerstart
-	t12.player.weapon = entities.FireballGun()
+
+	inventory.addWeapon(entities.Pistol(False))
+	inventory.addWeapon(entities.FireballGun(False))
+	inventory.addWeapon(entities.Shotgun(False))
+	inventory.changeWeapon(0)
 	
 
 	firstframe = True
 	last_time = 0
 	seconds = 0
 	ctime = 0
+
+	lastWeaponTextLength = 0
 
 	activating = False # is the player pressing the activate button?
 
@@ -101,7 +110,7 @@ def main():
 					t12.player.attack(t12.dir_up)
 				elif event.key == pygame.K_s:
 					t12.player.attack(t12.dir_down)
-				elif event.key == pygame.K_SPACE or event.key == pygame.K_e:
+				elif event.key == pygame.K_SPACE:
 					activating = True
 				elif event.key == pygame.K_UP:
 					if t12.player.grounded:
@@ -124,6 +133,12 @@ def main():
 				elif event.key == K_ESCAPE:
                                         pygame.quit()
                                         sys.exit()
+				elif event.key == K_q:
+					inventory.previousWeapon()
+				elif event.key == K_e:
+					inventory.nextWeapon()
+				elif K_9 >= event.key >= K_1:
+					inventory.changeWeapon(event.key - K_1)
 			if event.type == pygame.KEYUP:
 				if event.key == K_LEFT and t12.player.velx < 0:
 					t12.flags["input left"] = False
@@ -245,7 +260,9 @@ def main():
 		weapon_text = font.render("Weapon: " + t12.player.weapon.name, 1, (0, 0, 0))
 		health_text = font.render("Health: ", 1, (0, 0, 0))
 		screen.blit(weapon_text, (10, screen.get_height()-30))
-		pygame.display.update((10, screen.get_height()-30, weapon_text.get_width(), weapon_text.get_height()))
+		pygame.display.update((10, screen.get_height()-30, max(lastWeaponTextLength, weapon_text.get_width()), weapon_text.get_height()))
+		screen.fill((0, 0, 0), (10, screen.get_height()-30, max(lastWeaponTextLength, weapon_text.get_width()), weapon_text.get_height()))
+		lastWeaponTextLength = weapon_text.get_width()
 		healthx, healthy = 10, screen.get_height()-30 - weapon_text.get_height() - 5
 		screen.blit(health_text, (healthx, healthy))
 
@@ -253,7 +270,7 @@ def main():
 		screen.fill((255, 0, 0), healthbar)
 		pygame.draw.rect(screen, (0, 0, 0), (healthx+health_text.get_width(), healthy, 100, health_text.get_height()), 1)
 
-		pygame.display.update(healthx, healthy, health_text.get_width()+100, health_text.get_height())
+		pygame.display.update(healthx, healthy, max(lastWeaponTextLength, health_text.get_width()+100), health_text.get_height())
 
 		clock.tick(60)
 

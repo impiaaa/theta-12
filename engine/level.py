@@ -148,6 +148,7 @@ def tload():
 	trig2.reactors.append(reactor2)
 	trig3.reactors.append(react3)
 
+
 	troom.add(fblock)
 
 	wall = entities.Block((100, 200, 50, 200), None)
@@ -198,6 +199,8 @@ def tload():
 	troom.add(shifter2)
 	troom.add(entities.Block((shifter.geom.left - 1100, -580, 100, 20), None))
 
+	troom.add(entities.HealthPack((fblock.geom.centerx, fblock.geom.top-12), 2))
+
 	guyanim = t12.sprites["Garrett"]
 	guy = entities.Actor((0, 0, 1, 1), guyanim)
 	guy.name = "Guy"
@@ -208,7 +211,7 @@ def tload():
 	guy.geom.bottom = elevator.geom.top - 1
 	guy.autoconform_geom = True
 
-	fireballanim = t12.sprites["Firebolt"]
+	guy.weapon = entities.FireballGun(True)
 
 	def guythink():
 		guy.lastThrow = 0
@@ -265,22 +268,21 @@ def tload():
 		else:
 			if guy.anim.seq_name == "punch left": guy.anim.runSequence("left")
 			elif guy.anim.seq_name == "punch right": guy.anim.runSequence("right")
-				
-
-	def guyattack(dire):
-		meat = entities.DamageProjectile((0, 0, 1, 1), fireballanim, 90, 500, 1)
-		meat.adjustGeomToImage()
-		meat.geom.center = guy.geom.center
-		meat.attributes.append("touch_player")
-		meat.name = "Doom"
-		if dire == t12.dir_left: meat.setAngle(180)
-		elif dire == t12.dir_right: meat.setAngle(0)
-		guy.spawn.append(meat)
 
 
 	guy.think = guythink
-	guy.attack = guyattack
 
 	troom.add(guy)
+
+	guyres = entities.Activator((380, 350, 50, 50), t12.sprites["Tall Button"])
+	guyres.adjustGeomToImage()
+	def guyressurector(par=None):
+		guy.resurrect()
+		if guyres.anim.current_seq.name == "off":
+			guyres.anim.runSequence("on")
+		else:
+			guyres.anim.runSequence("off")
+	guyres.reactors.append(guyressurector)
+	troom.add(guyres)
 
 tlevel.load = tload
