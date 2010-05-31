@@ -42,6 +42,8 @@ def main():
 	
 	screen.blit(background, (0, 0))
 	pygame.display.flip()
+
+	font = pygame.font.Font(None, 24) 
 		
 	artist = graphwrap.Artist(screen, screen.get_size(), drects)
 	
@@ -234,6 +236,19 @@ def main():
 		pygame.display.update(drects)
 		#pygame.display.flip() # debug ONLY!
 		move(drects, last_drects, True)
+
+		weapon_text = font.render("Weapon: " + t12.player.weapon.name, 1, (0, 0, 0))
+		health_text = font.render("Health: ", 1, (0, 0, 0))
+		screen.blit(weapon_text, (10, screen.get_height()-30))
+		pygame.display.update((10, screen.get_height()-30, weapon_text.get_width(), weapon_text.get_height()))
+		healthx, healthy = 10, screen.get_height()-30 - weapon_text.get_height() - 5
+		screen.blit(health_text, (healthx, healthy))
+
+		healthbar = (healthx+health_text.get_width(), healthy, min(100, max(0, int(100. * t12.player.health / t12.player.maxhealth))), health_text.get_height())
+		screen.fill((255, 0, 0), healthbar)
+		pygame.draw.rect(screen, (0, 0, 0), (healthx+health_text.get_width(), healthy, 100, health_text.get_height()), 1)
+
+		pygame.display.update(healthx, healthy, health_text.get_width()+100, health_text.get_height())
 
 		clock.tick(60)
 
