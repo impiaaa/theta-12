@@ -729,7 +729,6 @@ class Actor(Entity):
 			self.kill(t12.sprites["Blood Splatter 30x30"])
 		if self.health <= 0:
 			self.kill(t12.sprites["Blood Splatter 30x30"])
-		print self.name, self.health
 		Entity.update(self, time)
 
 		if self.was_grounded and not self.grounded:
