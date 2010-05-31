@@ -33,6 +33,7 @@ class Entity:
 		self.geom = geom # pygame.rect.Rect or tuple
 		if not isinstance(geom, pygame.rect.Rect):
 			self.geom = pygame.rect.Rect(geom) # convert to pygame.rect.Rect
+		self.geom = pygame.rect.Rect((self.geom.left, self.geom.top, self.geom.width, self.geom.height)) # make copy
 		self.last = pygame.rect.Rect((self.geom.left, self.geom.top, self.geom.width, self.geom.height))
 		self.anim = anim # AnimSprite
 		if self.anim != None and self.anim != -1:
@@ -377,6 +378,24 @@ class Entity:
 			Subclasses are expected to override it to make it do something useful. """
 		return None
 
+class PoofEntity(Entity):
+	def __init__(self, geom, anim, residue=False):
+		""" Used for explosions, "poofs", etc
+			The optional "residue" bool will prevent
+			this "poof" from being removed once
+			its animation is done. """
+		Entity.__init__(self, geom, anim)
+		self.residue = residue
+		self.attributes.append("background")
+		self.attributes.append("art_front")
+		self.update(0)
+		self.adjustGeomToImage()
+
+	def _extraUpdate(self, par=None):
+		if self.residue: return
+		if self.anim == None or self.anim.sequenceDone():
+			self.flagForRemoval = True
+
 class FloorBlock(Entity):
 	def __init__(self, geom, anim):
 		""" Use Block instead of FloorBlock, please. """
@@ -696,12 +715,21 @@ class Actor(Entity):
 		if flags['push right'] and flags['stay left']: return True
 		return False
 
+	def kill(self, poof=None):
+		""" Kills this entity with the given 'splosion! """
+		if poof != None:
+			self.spawn.append(PoofEntity(self.geom, poof))
+		self.flagForRemoval = True
+
 	def update(self, time):
 		self.think()
 
 		if self._isSquashed():
 			print self.name + " was just squashed."
-
+			self.kill(t12.sprites["Blood Splatter 30x30"])
+		if self.health <= 0:
+			self.kill(t12.sprites["Blood Splatter 30x30"])
+		print self.name, self.health
 		Entity.update(self, time)
 
 		if self.was_grounded and not self.grounded:

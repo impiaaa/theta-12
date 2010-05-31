@@ -172,6 +172,11 @@ def main():
 			if a is t12.player: continue # this really should never happen
 			a.checkCollision(t12.player)
 
+		for a in croom.touch_enemies:
+			for b in croom.actors:
+				if a is b or b is t12.player: continue
+				a.checkCollision(b)
+
 		if activating:
 			for a in croom.activators:
 				if a is t12.player: continue # this really should never happen
