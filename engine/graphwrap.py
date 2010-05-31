@@ -59,10 +59,17 @@ class AnimSprite:
 		self.current_seq = None
 		self.current_image = None
 		self.seq_name = None
+		self.name = "Untitled Sprite"
 
 	def update(self, time):
 		if self.current_seq is not None:
 			self.current_image = self.current_seq.updateImage(time)
+
+	def sequenceDone(self):
+		if self.current_seq == None:
+			return True
+		if self.current_seq.looping: return False
+		return self.current_seq.onLastImage()
 
 	def putSequence(self, key, sequence):
 		self.sequences[key] = sequence
@@ -120,7 +127,8 @@ class AnimSequence:
 		else:
 			self.id = -1
 
-	
+	def onLastImage(self):
+		return self.__current_image_index == len(self.images)-1
 
 	def currentImage(self):
 		m = self.images[self.__current_image_index]

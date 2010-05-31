@@ -221,4 +221,21 @@
 			<frame>global/sprites/forcefield1.png</frame>
 		</sequence>
 	</sprite>
+	<sprite name="Blood Splatter 30x30" default="main">
+		<sequence duration="0.43333333333333335" name="main" flipx="0" flipy="0" loop="0">
+			<frame>global/sprites/blood01.png</frame>
+			<frame>global/sprites/blood02.png</frame>
+			<frame>global/sprites/blood03.png</frame>
+			<frame>global/sprites/blood04.png</frame>
+			<frame>global/sprites/blood05.png</frame>
+			<frame>global/sprites/blood07.png</frame>
+			<frame>global/sprites/blood08.png</frame>
+			<frame>global/sprites/blood09.png</frame>
+			<frame>global/sprites/blood10.png</frame>
+			<frame>global/sprites/blood11.png</frame>
+			<frame>global/sprites/blood12.png</frame>
+			<frame>global/sprites/blood13.png</frame>
+			<frame>global/sprites/blood14.png</frame>
+		</sequence>
+	</sprite>
 </spritelist>

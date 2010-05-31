@@ -11,6 +11,7 @@ def load(fname):
 	for spriteNode in spritelist.getElementsByTagName("sprite"):
 		sprite = graphwrap.AnimSprite()
 		sprName = spriteNode.getAttribute("name")
+		sprite.name = sprName
 		defaultSeq = spriteNode.getAttribute("default")
 		for sequenceNode in spriteNode.getElementsByTagName("sequence"):
 			duration = float(sequenceNode.getAttribute("duration"))
