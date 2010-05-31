@@ -659,7 +659,8 @@ class Actor(Entity):
 
 		self.weapon = None
 
-		self.health = 10 # arbitrary default
+		self.maxhealth = 10 # arbitrary default
+		self.health = self.maxhealth
 		self.jumpheight = 50 # arbitrary
 		self.speed = 100 # maximum horizontal movement speed (pixels/second)
 		self.acceleration = 500 # pixels/sec^2 acceleration
