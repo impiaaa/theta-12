@@ -213,7 +213,9 @@ class Artist:
 		self.offsetx, self.offsety = 0, 0
 
 	def drawHealthbar(self, actor, color):
+		if actor.health <= 0: return
 		wid = int(30. * actor.health / actor.maxhealth)
+		if wid <= 0: return
 		x = actor.geom.centerx - wid/2 + self.offsetx
 		y = actor.geom.top - 6 + self.offsety
 		rect = (x, y, wid, 5)

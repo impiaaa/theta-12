@@ -36,8 +36,11 @@ class Entity:
 		self.geom = pygame.rect.Rect((self.geom.left, self.geom.top, self.geom.width, self.geom.height)) # make copy
 		self.last = pygame.rect.Rect((self.geom.left, self.geom.top, self.geom.width, self.geom.height))
 		self.anim = anim # AnimSprite
+		self.name = "No Name"
 		if self.anim != None and self.anim != -1:
 			self.anim = self.anim.clone() # without this, really strange stuff will occur
+			self.name = self.anim.name
+		#print "Creating", self.name
 		self.velx, self.vely = 0, 0
 		self.move_allowed = True # flag set to false if collision is imminent
 		self.acx, self.acy = 0, 0 # constant acceleration (use acy for gravity)
@@ -409,6 +412,7 @@ class PoofEntity(Entity):
 		self.attributes.append("art_front")
 		self.update(0)
 		self.adjustGeomToImage()
+		self.name = self.anim.name
 
 	def _extraUpdate(self, par=None):
 		if self.residue: return
@@ -738,6 +742,7 @@ class Actor(Entity):
 
 	def kill(self, poof=None):
 		""" Kills this entity with the given 'splosion! """
+		#print "Killing", self.name
 		if poof != None:
 			self.spawn.append(PoofEntity(self.geom, poof))
 		self.remove()
@@ -746,7 +751,7 @@ class Actor(Entity):
 		self.think()
 
 		if self._isSquashed():
-			print self.name + " was just squashed."
+			#print self.name + " was just squashed."
 			self.kill(t12.sprites["Blood Splatter 30x30"])
 		if self.health <= 0:
 			self.kill(t12.sprites["Blood Splatter 30x30"])
@@ -800,6 +805,7 @@ class Actor(Entity):
 	def resurrect(self):
 		self.flagForRemoval = False
 		self.health = self.maxhealth
+		t12.current_level.croom.remove(self)
 		t12.current_level.croom.add(self)
 
 class HealthPack(MotionTrigger):
@@ -854,7 +860,7 @@ class DamageProjectile(Projectile):
 		Entity.finalizeCollision(self)
 
 	def _collision(self, other):
-		#print self.name, "hit", other.name
+		##print self.name, "hit", other.name
 		if not Projectile._collision(self, other): return
 		if self.ignorelist.count(other) > 0: return
 		if isinstance(other, Actor): 

@@ -48,6 +48,9 @@ class Room:
 
 	def add(self, entity):
 		""" Adds the entity to the appropriate lists based on its attributes """
+		if entity.name == None:
+			entity.name = "Untitled Thing"
+		t12.spam("Adding " + entity.name)
 		self.all.append(entity)
 		if entity.attributes.count("background") >= 1:
 			self.background.append(entity)
