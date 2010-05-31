@@ -750,12 +750,12 @@ class Projectile(Entity):
 		self.velx = magnitude * math.cos(math.radians(angle))
 		self.vely = magnitude * math.sin(math.radians(angle))
 		self.baseAngle = angle
-		self.artAngle = angle
+		self.artAngle = 360 - angle # flip vertically
 		self.moveAngle = angle
 		self.attributes.append("touch_geom")
 
 	def setAngle(self, angle):
-		self.artAngle = self.baseAngle + angle
+		self.artAngle = 360 - (self.baseAngle + angle)
 		if self.artAngle >= 360: self.artAngle = self.artAngle % 360
 		self.moveAngle = angle
 		self.setMagnitude(math.sqrt(self.velx**2 + self.vely**2))
@@ -794,9 +794,8 @@ class FireballGun(Weapon):
 		self.name = "Fireball Gun"
 
 	def use(self, by, startpoint, tar_polar):
-		ball = DamageProjectile((0, 0, 10, 1), t12.sprites["Firebolt"], 0, tar_polar[1], 1)
+		ball = DamageProjectile((0, 0, 10, 1), t12.sprites["Firebolt"], 90, tar_polar[1], 1)
 		ball.setAngle(tar_polar[0])
-		ball.artAngle = tar_polar[0] + 270
 		ball.adjustGeomToImage()
 		ball.geom.center = startpoint
 		ball.attributes.append("touch_enemies")
