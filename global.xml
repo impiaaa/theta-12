@@ -114,8 +114,18 @@
 		<sequence duration="1.0" name="right" flipx="1" flipy="0" loop="0">
 			<frame>global/sprites/Velociraptor2.png</frame>
 		</sequence>
+		<sequence duration="0.25" name="go right" flipx="1" flipy="0" loop="1">
+			<frame>global/sprites/VelociraptorRunning1.png</frame>
+			<frame>global/sprites/VelociraptorRunning2.png</frame>
+			<frame>global/sprites/Velociraptor2.png</frame>
+		</sequence>
 		<sequence duration="1.0" name="left" flipx="0" flipy="0" loop="0">
 			<frame>global/sprites/Velociraptor2.png</frame>
+		</sequence>
+		<sequence duration="0.25" name="go left" flipx="0" flipy="0" loop="1">
+			<frame>global/sprites/Velociraptor2.png</frame>
+			<frame>global/sprites/VelociraptorRunning2.png</frame>
+			<frame>global/sprites/VelociraptorRunning1.png</frame>
 		</sequence>
 	</sprite>
 	<sprite name="Teleporter" default="off">
