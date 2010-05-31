@@ -27,3 +27,6 @@ flags = {"input left": False, "input right": False}
 
 def fullPath(path):
 	return os.path.join(os.path.normpath(sys.path[0]+'/..'), path)
+
+def spam(text):
+	if False: print text

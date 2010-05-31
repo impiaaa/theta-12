@@ -28,7 +28,7 @@ def randomEntity():
 	e = entities.Entity(geom, None)
 	speed = random.random() * 100
 	e.velx, e.vely = math.cos(e.geom.angle)*speed, math.sin(e.geom.angle)*speed
-	print str(e.geom.getPoints())
+	#print str(e.geom.getPoints())
 	return e
 
 
@@ -130,6 +130,8 @@ def main():
 				elif event.key == pygame.K_c:
 					t12.player.geom.center = (200, 100)
 					t12.player.velx, t12.player.vely = 0, 0
+				elif event.key == pygame.K_r:
+					t12.player.resurrect()
 				elif event.key == K_ESCAPE:
                                         pygame.quit()
                                         sys.exit()
@@ -166,8 +168,11 @@ def main():
 
 
 		# update movement/spawn things
+		#print "Updating croom.all"
 		for e in croom.all:
 			if e.flagForRemoval:
+				if e.name != None:
+					t12.spam("Removing " + '"' + e.name + '"')
 				croom.remove(e)
 				continue
 			e.update(seconds)
@@ -178,6 +183,7 @@ def main():
 
 				
 		# detect collisions
+		#print "Detecting Collisions"
 		for a in croom.geometry:
 			for b in croom.touch_geom:
 				if a is b: continue # this really should never happen
@@ -198,9 +204,11 @@ def main():
 				if a.intersects(t12.player):
 					a.activate()
 
+		#print "Finalizing Collisions"
 		for e in croom.all:
 			e.finalizeCollision()
 
+		#print "Appyling Gravity"
 		for a in croom.actors:
 			if not a.grounded:
 				a.acy = t12.gravity
@@ -215,6 +223,7 @@ def main():
 		elif t12.player.geom.bottom - t12.camy > hig - 50:
 			hd = t12.player.geom.bottom - hig + 100 
 
+		#print "Translating Graphics"
 		# The following rant describes the next two lines of actual code.
 		# Both of these are divided by 5 because in my experience the number 5 works pretty well.
 		# What the /5 means is that the time remaining until the camera is where it should be
@@ -239,6 +248,7 @@ def main():
 			artist.offsety -= yinc
 
 		# draw everything
+		#print "Drawing Everything"
 		for e in croom.art_back:
 			e.updateArt(seconds)
 			e.draw(artist)
@@ -252,11 +262,13 @@ def main():
 			e.updateArt(seconds)
 			e.draw(artist)
 
+		#print "Updating Dirty Rects"
 		pygame.display.update(last_drects)
 		pygame.display.update(drects)
 		#pygame.display.flip() # debug ONLY!
 		move(drects, last_drects, True)
 
+		#print "Drawing Status Text"
 		weapon_text = font.render("Weapon: " + t12.player.weapon.name, 1, (0, 0, 0))
 		health_text = font.render("Health: ", 1, (0, 0, 0))
 		screen.blit(weapon_text, (10, screen.get_height()-30))
@@ -267,11 +279,13 @@ def main():
 		screen.blit(health_text, (healthx, healthy))
 
 		healthbar = (healthx+health_text.get_width(), healthy, min(100, max(0, int(100. * t12.player.health / t12.player.maxhealth))), health_text.get_height())
-		screen.fill((255, 0, 0), healthbar)
+		if healthbar[2] > 0: # don't try to draw the bar if it is less than 1, or things may break.
+			screen.fill((255, 0, 0), healthbar)
 		pygame.draw.rect(screen, (0, 0, 0), (healthx+health_text.get_width(), healthy, 100, health_text.get_height()), 1)
 
 		pygame.display.update(healthx, healthy, max(lastWeaponTextLength, health_text.get_width()+100), health_text.get_height())
 
+		#print "Ticking"
 		clock.tick(60)
 
 
