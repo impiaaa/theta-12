@@ -68,6 +68,13 @@ class Entity:
 						'stay left':False, 'stay right':False, 'stay up':False, 'stay down':False} # these are reset every frame
 		self.was_grounded = False
 
+	def setHealth(self, value):
+		if value < 0:
+			value = 0
+		if value > self.maxhealth:
+			self.maxhealth = value
+		self.health = value
+
 	def flag(self, key):
 		self.flags[key] = True
 	def unflag(self, key):
@@ -299,6 +306,12 @@ class Entity:
 		
 		artist.addDirtyRect(self.geom)
 		artist.addDirtyRect(self.last)
+		
+		self._moredraw(artist)
+
+	def _moredraw(self, artist):
+		""" Extra drawing """
+		return None # can be overriden by subclasses
 
 	def updateArt(self, time):
 		if self.anim is not None and self.anim != -1:
@@ -377,6 +390,12 @@ class Entity:
 		""" This method is called when this entity hits another entity.
 			Subclasses are expected to override it to make it do something useful. """
 		return None
+
+	def remove(self):
+		self.flagForRemoval = True
+
+	def removed(self):
+		return self.flagForRemoval
 
 class PoofEntity(Entity):
 	def __init__(self, geom, anim, residue=False):
@@ -678,6 +697,8 @@ class Actor(Entity):
 
 		self.weapon = None
 
+		self.showhealthbar = True
+
 		self.maxhealth = 10 # arbitrary default
 		self.health = self.maxhealth
 		self.jumpheight = 50 # arbitrary
@@ -719,7 +740,7 @@ class Actor(Entity):
 		""" Kills this entity with the given 'splosion! """
 		if poof != None:
 			self.spawn.append(PoofEntity(self.geom, poof))
-		self.flagForRemoval = True
+		self.remove()
 
 	def update(self, time):
 		self.think()
@@ -772,6 +793,29 @@ class Actor(Entity):
 			sign = abs(self.vely)/self.vely
 			self.vely -= sign * y
 
+	def _moredraw(self, artist):
+		if t12.healthbars and self.showhealthbar:
+			artist.drawHealthbar(self, (255, 0, 0))
+
+	def resurrect(self):
+		self.flagForRemoval = False
+		self.health = self.maxhealth
+		t12.current_level.croom.add(self)
+
+class HealthPack(MotionTrigger):
+	def _heal(self, other):
+		if self.removed(): return
+		if isinstance(other, Actor):
+			other.health += self.amount
+			self.remove()
+
+	def __init__(self, location, amount):
+		MotionTrigger.__init__(self, (location[0], location[1], 1, 1), t12.sprites["Animal Meat"])
+		self.update(0)
+		self.adjustGeomToImage()
+		self.amount = amount
+		self.reactors.append(self._heal)
+
 class Projectile(Entity):
 	def __init__(self, geom, anim, angle, magnitude):
 		Entity.__init__(self, geom, anim)
@@ -813,19 +857,40 @@ class DamageProjectile(Projectile):
 		#print self.name, "hit", other.name
 		if not Projectile._collision(self, other): return
 		if self.ignorelist.count(other) > 0: return
-		if isinstance(other, Actor):
+		if isinstance(other, Actor): 
 			other.health -= self.damage
 
-class FireballGun(Weapon):
-	def __init__(self):
+class Gun(Weapon):
+	def __init__(self, name, bart, bdamage, bangle, bspeed, evil):
+		""" name (text name of weapon), bart (art for bullet), 
+			bdamage (damage bullet does), bangle (art angle of bullet), 
+			bspeed (speed of bullet), evil (if true this can hurt the player) """
 		Weapon.__init__(self)
-		self.name = "Fireball Gun"
+		self.name = name
+		self.bart = bart
+		self.bdamage, self.bangle, self.bspeed = bdamage, bangle, bspeed
+		self.evil = evil
 
 	def use(self, by, startpoint, tar_polar):
-		ball = DamageProjectile((0, 0, 10, 1), t12.sprites["Firebolt"], 90, tar_polar[1], 1)
+		ball = DamageProjectile((0, 0, 1, 1), self.bart, self.bangle, self.bspeed, self.bdamage)
 		ball.setAngle(tar_polar[0])
 		ball.adjustGeomToImage()
 		ball.geom.center = startpoint
-		ball.attributes.append("touch_enemies")
-		ball.name = "FireballGun Fireball"
+		if self.evil:
+			ball.attributes.append("touch_player")
+		else:
+			ball.attributes.append("touch_enemies")
+		ball.name = self.bart.name + " from " + self.name
 		by.spawn.append(ball)
+
+class FireballGun(Gun):
+	def __init__(self, evil):
+		Gun.__init__(self, "Fireball Gun", t12.sprites["Firebolt"], 1, 90, 500, evil)
+
+class Pistol(Gun):
+	def __init__(self, evil):
+		Gun.__init__(self, "Pistol", t12.sprites["Bullet 02"], 2, 0, 2000, evil)
+
+class Shotgun(Gun):
+	def __init__(self, evil):
+		Gun.__init__(self, "Shotgun", t12.sprites["Bullet 01"], 5, 0, 1000, evil)

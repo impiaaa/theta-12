@@ -212,6 +212,14 @@ class Artist:
 		self.dirty_rects = dirty_rects
 		self.offsetx, self.offsety = 0, 0
 
+	def drawHealthbar(self, actor, color):
+		wid = int(30. * actor.health / actor.maxhealth)
+		x = actor.geom.centerx - wid/2 + self.offsetx
+		y = actor.geom.top - 6 + self.offsety
+		rect = (x, y, wid, 5)
+		self.screen.fill(color, rect)
+		self.dirty_rects.append(rect)
+
 	def addDirtyRect(self, rect):
 		dr = (rect[0]-3 + self.offsetx, rect[1]-3 + self.offsety, rect[2]+6, rect[3]+6)
 

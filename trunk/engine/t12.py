@@ -12,6 +12,7 @@ gravity = 386 # 9.8 m/s, according to the art team's scale
 camy = 0 # vertical camera offset to be reset each time a room is loaded.
 seconds_passed = 0 # time passed in the last frame
 game_time = 0 # seconds passed during the whole game
+healthbars = True
 
 dir_up = 1
 dir_down = 10
