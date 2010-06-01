@@ -946,4 +946,4 @@ class Pistol(Gun):
 
 class Shotgun(Gun):
 	def __init__(self, evil):
-		Gun.__init__(self, "Shotgun", t12.sprites["Bullet 01"], 5, 0, 1000, evil)
+		Gun.__init__(self, "Shotgun", t12.sprites["Bullet 03"], 5, 0, 1000, evil)
