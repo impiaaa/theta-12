@@ -836,11 +836,16 @@ class Actor(Entity):
 		if t12.healthbars and self.showhealthbar:
 			artist.drawHealthbar(self, (255, 0, 0))
 		if self.weapon != None and self.weapon.graphic != None:
+			left, right = self.geom.left, self.geom.right
+			if self.anim != None and self.anim != -1 and self.anim.getImage() != None:
+				m = self.anim.getImage()
+				left = self.geom.centerx - m.get_width()/2
+				right = self.geom.centerx + m.get_width()/2
 			if self.getFace() == t12.dir_left:
-				x = self.geom.left - self.weapon.graphic.get_width()
+				x = left - self.weapon.graphic.get_width()
 				img = pygame.transform.flip(self.weapon.graphic, 1, 0)
 			else:
-				x = self.geom.right
+				x = right
 				img = self.weapon.graphic
 			artist.drawImage(img, (x, self.geom.centery))
 
