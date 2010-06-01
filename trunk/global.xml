@@ -248,6 +248,11 @@
 			<frame>global/sprites/bullet02.png</frame>
 		</sequence>
 	</sprite>
+	<sprite name="Bullet 03" default="main">
+		<sequence duration="1.0" name="main" flipx="0" flipy="0" loop="0">
+			<frame>global/sprites/bullet03.png</frame>
+		</sequence>
+	</sprite>
 	<sprite name="Pistol" default="main">
 		<sequence duration="1.0" name="main" flipx="0" flipy="0" loop="0">
 			<frame>global/sprites/pistol.png</frame>
