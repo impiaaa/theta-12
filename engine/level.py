@@ -214,7 +214,7 @@ def tload():
 	guy.geom.bottom = elevator.geom.top - 1
 	guy.autoconform_geom = True
 
-	guy.weapon = entities.FireballGun(True)
+	guy.weapon = entities.Pistol(True)
 
 	def guythink():
 		guy.lastThrow = 0

@@ -718,12 +718,17 @@ class Actor(Entity):
 	def getFace(self):
 		if self.anim == None or self.anim == -1 or self.anim.current_seq == None:
 			return -1
-		if (self.anim.current_seq.name == "go left" or self.anim.current_seq.name == "left"
-			or self.anim.current_seq.name == "jump left"):
-			return t12.dir_left
-		if (self.anim.current_seq.name == "go right" or self.anim.current_seq.name == "right"
-			or self.anim.current_seq.name == "jump right"):
-			return t12.dir_right
+		text = self.anim.current_seq.name.lower()
+		if text.count(" ") == 0:
+			parts = [text]
+		else:
+			parts = text.split(" ")
+		for p in parts:
+			if p == "left":
+				return t12.dir_left
+			elif p == "right":
+				return t12.dir_right
+		return -1
 
 	def attack(self, direction, target=None):
 		""" Direction is an integer. see t12.dir_up, t12.dir_left, et cetera """
