@@ -213,6 +213,7 @@ def tload():
 	guy.geom.centerx = elevator.geom.centerx
 	guy.geom.bottom = elevator.geom.top - 1
 	guy.autoconform_geom = True
+	guy.hands = (19, 6)
 
 	guy.weapon = entities.Pistol(True)
 

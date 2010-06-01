@@ -14,6 +14,7 @@ class Weapon:
 		self.name = "Untitled Weapon"
 		self.icon = None
 		self.graphic = None
+		self.graphicmount = None
 
 	def use(self, by, startpoint, tar_polar):
 		""" This doesn't do anything in the base Weapon class.
@@ -802,10 +803,14 @@ class Actor(Entity):
 		self.more_vy = 0
 
 	def left(self):
+		if self.weapon != None and isinstance(self.weapon, Gun) and self.getFace() != t12.dir_left:
+			self.weapon.shootangle = 180
 		if self.anim != None: self.anim.runSequence("go left", "left")
 		self.velx = max(-self.speed, self.velx - self.acceleration)
 
 	def right(self):
+		if self.weapon != None and isinstance(self.weapon, Gun) and self.getFace() != t12.dir_right:
+			self.weapon.shootangle = 0
 		if self.anim != None: self.anim.runSequence("go right", "right")
 		self.velx = min(self.speed, self.velx + self.acceleration)
 
@@ -836,18 +841,102 @@ class Actor(Entity):
 		if t12.healthbars and self.showhealthbar:
 			artist.drawHealthbar(self, (255, 0, 0))
 		if self.weapon != None and self.weapon.graphic != None:
-			left, right = self.geom.left, self.geom.right
+			left, right, top = self.geom.left, self.geom.right, self.geom.top
+			width = self.geom.width
+			height = self.geom.height
 			if self.anim != None and self.anim != -1 and self.anim.getImage() != None:
 				m = self.anim.getImage()
 				left = self.geom.centerx - m.get_width()/2
 				right = self.geom.centerx + m.get_width()/2
+				top = self.geom.centery - m.get_height()/2
+				width = m.get_width()
+				height = m.get_height()
+
+			angle = 0
+			if isinstance(self.weapon, Gun):
+				angle = self.weapon.shootangle
+
 			if self.getFace() == t12.dir_left:
-				x = left - self.weapon.graphic.get_width()
+				x, y = self._leftWeaponMount()
 				img = pygame.transform.flip(self.weapon.graphic, 1, 0)
+				angle = 180 - angle
 			else:
-				x = right
+				angle = 360 - angle
+				x, y = self._rightWeaponMount()
 				img = self.weapon.graphic
-			artist.drawImage(img, (x, self.geom.centery))
+
+			artist.drawImage(img, (x, y), angle=angle)
+
+	def _rotatedHandle(self, handle):
+		handlex, handley = handle
+		gm = self.weapon.graphic
+		ox, oy = gm.get_width()/2, gm.get_height()/2
+		dx, dy = handlex - ox, handley - oy
+		oangle = physics.getAngle(dx, dy)
+		na = oangle + math.radians(self.weapon.shootangle)
+		mag = math.sqrt(dx**2 + dy**2)
+		cdx, cdy = mag*math.cos(na), mag*math.sin(na)
+		gm = pygame.transform.rotate(gm, math.degrees(na))
+		x, y = gm.get_width()/2 + cdx, gm.get_height()/2 + cdy
+		return x, y
+
+	def _leftWeaponMount(self):
+		if self.anim != None and self.anim != -1 and self.anim.getImage() != None:
+			m = self.anim.getImage()
+			left = self.geom.centerx - m.get_width()/2
+			right = self.geom.centerx + m.get_width()/2
+			top = self.geom.centery - m.get_height()/2
+			width = m.get_width()
+			height = m.get_height()
+		else:
+			width = self.geom.width
+			height = self.geom.height
+			left = self.geom.left
+			right = self.geom.right
+			top = self.geom.top
+		handx, handy = 0, self.geom.height/2
+		if self.hands != None:
+			handx, handy = self.hands
+		if handx > width/2:
+			handx = width - handx
+
+		x = left + handx
+		y = top + handy
+		gx, gy = self.weapon.graphic.get_width(), 0
+		if self.weapon.graphicmount != None:
+			gx, gy = self.weapon.graphicmount
+		if isinstance(self.weapon, Gun):
+			gx, gy = self._rotatedHandle((gx, gy))
+		return (x - gx, y - gy)
+
+
+	def _rightWeaponMount(self):
+		if self.anim != None and self.anim != -1 and self.anim.getImage() != None:
+			m = self.anim.getImage()
+			left = self.geom.centerx - m.get_width()/2
+			right = self.geom.centerx + m.get_width()/2
+			top = self.geom.centery - m.get_height()/2
+			width = m.get_width()
+			height = m.get_height()
+		else:
+			width = self.geom.width
+			height = self.geom.height
+			left = self.geom.left
+			right = self.geom.right
+			top = self.geom.top
+		handx, handy = 0, self.geom.height/2
+		if self.hands != None:
+			handx, handy = self.hands
+		if handx < width/2:
+			handx = width - handx
+		x = left + handx
+		y = top + handy
+		gx, gy = self.weapon.graphic.get_width(), 0
+		if self.weapon.graphicmount != None:
+			gx, gy = self.weapon.graphicmount
+		if isinstance(self.weapon, Gun):
+			gx, gy = self._rotatedHandle((gx, gy))
+		return (x - gx, y - gy)
 
 	def resurrect(self):
 		self.flagForRemoval = False
@@ -903,7 +992,7 @@ class DamageProjectile(Projectile):
 		self.ignorelist = [] # list of entities I can't hit
 		self.anim.current_seq.flipy = True
 		self.graphic = None
-		self.graphicmount = (0, 0)
+		self.graphicmount = None
 
 	def finalizeCollision(self):
 		Entity.finalizeCollision(self)
@@ -925,10 +1014,12 @@ class Gun(Weapon):
 		self.bart = bart
 		self.bdamage, self.bangle, self.bspeed = bdamage, bangle, bspeed
 		self.evil = evil
+		self.shootangle = 0
 
 	def use(self, by, startpoint, tar_polar):
 		ball = DamageProjectile((0, 0, 1, 1), self.bart, self.bangle, self.bspeed, self.bdamage)
 		ball.setAngle(tar_polar[0])
+		self.shootangle = tar_polar[0]
 		ball.adjustGeomToImage()
 		ball.geom.center = startpoint
 		if self.evil:
@@ -942,6 +1033,7 @@ class FireballGun(Gun):
 	def __init__(self, evil):
 		Gun.__init__(self, "Fireball Gun", t12.sprites["Firebolt"], 1, 90, 500, evil)
 		self.graphic = t12.imageLoader.getImage("global/sprites/fireball1.png")
+		self.graphicmount = (5, 5)
 
 class Pistol(Gun):
 	def __init__(self, evil):
@@ -952,3 +1044,5 @@ class Pistol(Gun):
 class Shotgun(Gun):
 	def __init__(self, evil):
 		Gun.__init__(self, "Shotgun", t12.sprites["Bullet 03"], 5, 0, 1000, evil)
+		self.graphic = t12.imageLoader.getImage("global/sprites/shotgun.png")
+		self.graphicmount = (5, 3)
