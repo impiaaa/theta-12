@@ -702,6 +702,7 @@ class Actor(Entity):
 		self.weapon = None
 
 		self.showhealthbar = True
+		self.hands = (0, 0)
 
 		self.maxhealth = 10 # arbitrary default
 		self.health = self.maxhealth
@@ -713,6 +714,14 @@ class Actor(Entity):
 		self.lastFloor = None # the last entity I stood on
 		self.update(0) # for the feetbox
 		self.think() # for AI
+
+	def getFace(self):
+		if self.anim == None or self.anim == -1 or self.anim.current_seq == None:
+			return -1
+		if self.anim.current_seq.name == "go left" or self.anim.current_seq.name == "left":
+			return t12.dir_left
+		if self.anim.current_seq.name == "go right" or self.anim.current_seq.name == "right":
+			return t12.dir_right
 
 	def attack(self, direction, target=None):
 		""" Direction is an integer. see t12.dir_up, t12.dir_left, et cetera """
@@ -801,6 +810,14 @@ class Actor(Entity):
 	def _moredraw(self, artist):
 		if t12.healthbars and self.showhealthbar:
 			artist.drawHealthbar(self, (255, 0, 0))
+		if self.weapon != None and self.weapon.graphic != None:
+			if self.getFace() == t12.dir_left:
+				x = self.geom.left - self.weapon.graphic.get_width()
+				img = pygame.transform.flip(self.weapon.graphic, 1, 0)
+			else:
+				x = self.geom.right
+				img = self.weapon.graphic
+			artist.drawImage(img, (x, self.geom.centery))
 
 	def resurrect(self):
 		self.flagForRemoval = False
@@ -855,6 +872,8 @@ class DamageProjectile(Projectile):
 		self.damage = damage
 		self.ignorelist = [] # list of entities I can't hit
 		self.anim.current_seq.flipy = True
+		self.graphic = None
+		self.graphicmount = (0, 0)
 
 	def finalizeCollision(self):
 		Entity.finalizeCollision(self)
@@ -892,10 +911,13 @@ class Gun(Weapon):
 class FireballGun(Gun):
 	def __init__(self, evil):
 		Gun.__init__(self, "Fireball Gun", t12.sprites["Firebolt"], 1, 90, 500, evil)
+		self.graphic = t12.imageLoader.getImage("global/sprites/fireball1.png")
 
 class Pistol(Gun):
 	def __init__(self, evil):
 		Gun.__init__(self, "Pistol", t12.sprites["Bullet 02"], 2, 0, 2000, evil)
+		self.graphic = t12.imageLoader.getImage("global/sprites/pistol.png")
+		self.graphicmount = (6, 5)
 
 class Shotgun(Gun):
 	def __init__(self, evil):
