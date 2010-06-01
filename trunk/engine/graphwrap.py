@@ -267,4 +267,6 @@ class Artist:
 			image = pygame.transform.rotate(image, angle)
 		pos = (pos[0] + self.offsetx, pos[1] + self.offsety)
 		self.screen.blit(image, pos)
+		rect = (pos[0], pos[1], image.get_width(), image.get_height())
+		self.dirty_rects.append(rect)
 		return image

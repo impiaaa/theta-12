@@ -60,6 +60,7 @@ def main():
 	t12.player.jumpheight = 72 # wikianswers says this number should be 72, but that is boring.
 	t12.player.speed = 396 # 396 in/2s according to wikianswers
 	t12.player.setHealth(30)
+	t12.player.hands = (55, 20)
 	t12.player.showhealthbar = False
 	
 	t12.player.adjustGeomToImage()
