@@ -1,6 +1,6 @@
 <spritelist relative="1">
 	<sprite name="Compsognathus" default="left">
-		<sequence duration="0.7" name="walk right" flipx="1" flipy="0" loop="1">
+		<sequence duration="0.7" name="go right" flipx="1" flipy="0" loop="1">
 			<frame>global/sprites/Compsognathus_Walk_f7.png</frame>
 			<frame>global/sprites/Compsognathus_Walk_f8.png</frame>
 			<frame>global/sprites/Compsognathus_Walk_f9.png</frame>
@@ -34,7 +34,7 @@
 			<frame>global/sprites/Compsognathus_Bite_f2.png</frame>
 			<frame>global/sprites/Compsognathus_Bite_f3.png</frame>
 		</sequence>
-		<sequence duration="0.7" name="walk left" flipx="0" flipy="0" loop="1">
+		<sequence duration="0.7" name="go left" flipx="0" flipy="0" loop="1">
 			<frame>global/sprites/Compsognathus_Walk_f1.png</frame>
 			<frame>global/sprites/Compsognathus_Walk_f2.png</frame>
 			<frame>global/sprites/Compsognathus_Walk_f3.png</frame>
