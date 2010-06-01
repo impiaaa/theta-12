@@ -718,9 +718,11 @@ class Actor(Entity):
 	def getFace(self):
 		if self.anim == None or self.anim == -1 or self.anim.current_seq == None:
 			return -1
-		if self.anim.current_seq.name == "go left" or self.anim.current_seq.name == "left":
+		if (self.anim.current_seq.name == "go left" or self.anim.current_seq.name == "left"
+			or self.anim.current_seq.name == "jump left"):
 			return t12.dir_left
-		if self.anim.current_seq.name == "go right" or self.anim.current_seq.name == "right":
+		if (self.anim.current_seq.name == "go right" or self.anim.current_seq.name == "right"
+			or self.anim.current_seq.name == "jump right"):
 			return t12.dir_right
 
 	def attack(self, direction, target=None):
@@ -765,6 +767,24 @@ class Actor(Entity):
 		if self.health <= 0:
 			self.kill(t12.sprites["Blood Splatter 30x30"])
 		Entity.update(self, time)
+
+		if abs(self.vely) > 0:
+			if self.getFace() == t12.dir_left:
+				self.anim.runSequence("jump left", "left")
+			elif self.getFace() == t12.dir_right:
+				self.anim.runSequence("jump right", "right")
+
+		if self.getFace() != -1 and (abs(self.vely)==0 or self.grounded):
+			if self.anim.current_seq.name == "jump left":
+				if self.velx < 0:
+					self.anim.runSequence("run left", "left")
+				else:
+					self.anim.runSequence("left")
+			elif self.anim.current_seq.name == "jump right":
+				if self.velx > 0:
+					self.anim.runSequence("run right", "right")
+				else:
+					self.anim.runSequence("right")
 
 		if self.was_grounded and not self.grounded:
 			if self.vely > 0:
