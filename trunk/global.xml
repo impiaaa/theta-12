@@ -222,7 +222,7 @@
 		</sequence>
 	</sprite>
 	<sprite name="Blood Splatter 30x30" default="main">
-		<sequence duration="0.43333333333333335" name="main" flipx="0" flipy="0" loop="0">
+		<sequence duration="0.65" name="main" flipx="0" flipy="0" loop="0">
 			<frame>global/sprites/blood01.png</frame>
 			<frame>global/sprites/blood02.png</frame>
 			<frame>global/sprites/blood03.png</frame>
