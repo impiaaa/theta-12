@@ -1,5 +1,11 @@
 import pygame
 from pgu import gui
+import sys
+# pathackery
+sys.path += [sys.path[0][:sys.path[0].rfind('/')]]
+sys.path += [sys.path[-1]+'/engine']
+# we should fix this at some point by making everything a package
+import t12
 
 class LabeledCheckbox(gui.Table):
 	def __init__(self, label, value=False, parent=None):
@@ -79,7 +85,7 @@ class BaseEntityEditor(gui.Table):
 		t.tr()
 		nt = gui.Table()
 		nt.tr()
-		nt.td(gui.Image(pygame.image.load("/Users/impiaaa/Downloads/theta-12/global/sprites/Velociraptor2.png")), rowspan=3)
+		nt.td(gui.Image(pygame.image.load(t12.fullPath("global/sprites/Velociraptor2.png"))), rowspan=3)
 		nt.td(gui.Input("Foo Monster", width=192), align=1)
 		nt.tr()
 		nt.td(gui.Label("0"), align=-1)
