@@ -1,4 +1,5 @@
 import pygame
+from pygame.locals import *
 from pgu import gui
 import sys
 # pathackery
@@ -6,6 +7,7 @@ sys.path += [sys.path[0][:sys.path[0].rfind('/')]]
 sys.path += [sys.path[-1]+'/engine']
 # we should fix this at some point by making everything a package
 import t12
+import entities, spriteloader
 
 class LabeledCheckbox(gui.Table):
 	def __init__(self, label, value=False, parent=None):
@@ -80,27 +82,35 @@ class BaseEntityEditor(gui.Table):
 	def __init__(self, **params):
 		params.setdefault('cls', 'dialog')
 		gui.Table.__init__(self, **params)
-		
+		if "entity" in params: self.entity = params["entity"]
+	
+	def layout(self):
+		self.clear()
 		t = gui.Table()
 		t.tr()
 		nt = gui.Table()
 		nt.tr()
-		nt.td(gui.Image(pygame.image.load(t12.fullPath("global/sprites/Velociraptor2.png"))), rowspan=3)
-		nt.td(gui.Input("Foo Monster", width=192), align=1)
+		self.im = gui.Image(self.entity.anim.sequences[self.entity.anim.sequences.keys()[0]].images[0])
+		nt.td(self.im, rowspan=3)
+		self.name = gui.Input(self.entity.name, width=192)
+		self.name.connect(gui.CHANGE, self.change, self.name)
+		nt.td(self.name, align=1)
 		nt.tr()
-		nt.td(gui.Label("0"), align=-1)
+		self.id = gui.Label(str(self.entity.id))
+		nt.td(self.id, align=-1)
 		nt.tr()
-		nt.td(LabeledCheckbox("Invisible"), align=-1)
+		self.invisible = LabeledCheckbox("Invisible")
+		nt.td(self.invisible, align=-1)
 		nt.tr()
 		t.td(nt, align=-1)
 		
 		t.tr()
 		t.td(gui.Label("Attributes"), align=-1)
 		t.tr()
-		l = gui.List(272, 80)
-		l.add("health = 4")
-		l.add("stage = 9")
-		t.td(l, align=-1) # These dimensions could be dynamic
+		self.attrList = gui.List(272, 80)
+		self.attrList.add("health = 4")
+		self.attrList.add("stage = 9")
+		t.td(self.attrList, align=-1) # These dimensions could be dynamic
 
 		t.tr()
 		t.td(gui.Label("Groups"), align=-1)
@@ -132,18 +142,35 @@ class BaseEntityEditor(gui.Table):
 		self.td(gui.Label("Base Entity"), cls=self.cls+'.bar', align=-1)
 		self.tr()
 		self.td(t, cls=self.cls+'.main')
+	
+	def change(self, widget):
+		if widget == self.name: self.entity.name = widget.value
 
-class LevelEditor(gui.App):
-	def __init__(self):
-		gui.App.__init__(self)
+class LevelEditor(gui.Desktop):
+	def __init__(self, **params):
+		gui.Desktop.__init__(self, **params)
 		
 		self.connect(gui.QUIT, self.quit, None)
 		self.library = Library()
 		self.baseEntityEditor = BaseEntityEditor()
-		self.t = gui.Table()
-		self.t.tr()
-		self.t.td(self.library)
-		self.t.td(self.baseEntityEditor)
+		self.t = gui.ScrollArea(self.library)
+		self.switch = 0
+	def init(self, *args, **params):
+		gui.App.init(self, *args, **params)
+		spriteloader.load("global.xml")
+		self.baseEntityEditor.entity = entities.HealthPack((0, 0), 100)
+		self.baseEntityEditor.entity.name = "Hello"
+	def event(self,e):
+		gui.Desktop.event(self,e)
+		if e.type == KEYDOWN:
+			if self.switch == 0:
+				self.baseEntityEditor.layout()
+				self.t.widget = self.baseEntityEditor
+				self.switch = 1
+			else:
+				self.t.widget = self.library
+				self.switch = 0
 
 app = LevelEditor()
 app.run(app.t)
+
