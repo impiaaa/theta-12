@@ -7,7 +7,7 @@ sys.path += [sys.path[0][:sys.path[0].rfind('/')]]
 sys.path += [sys.path[-1]+'/engine']
 # we should fix this at some point by making everything a package
 import t12
-import entities, spriteloader
+import entities, spriteloader, main
 
 class LabeledCheckbox(gui.Table):
 	def __init__(self, label, value=False, parent=None):
@@ -146,31 +146,17 @@ class BaseEntityEditor(gui.Table):
 	def change(self, widget):
 		if widget == self.name: self.entity.name = widget.value
 
+class PlayfieldWidget(gui.Widget):
+	pass
+
 class LevelEditor(gui.Desktop):
 	def __init__(self, **params):
 		gui.Desktop.__init__(self, **params)
 		
 		self.connect(gui.QUIT, self.quit, None)
-		self.library = Library()
-		self.baseEntityEditor = BaseEntityEditor()
-		self.t = gui.ScrollArea(self.library)
-		self.switch = 0
 	def init(self, *args, **params):
 		gui.App.init(self, *args, **params)
 		spriteloader.load("global.xml")
-		self.baseEntityEditor.entity = entities.HealthPack((0, 0), 100)
-		self.baseEntityEditor.entity.name = "Hello"
-	def event(self,e):
-		gui.Desktop.event(self,e)
-		if e.type == KEYDOWN:
-			if self.switch == 0:
-				self.baseEntityEditor.layout()
-				self.t.widget = self.baseEntityEditor
-				self.switch = 1
-			else:
-				self.t.widget = self.library
-				self.switch = 0
 
 app = LevelEditor()
 app.run(app.t)
-

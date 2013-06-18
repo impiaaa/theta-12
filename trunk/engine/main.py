@@ -32,70 +32,71 @@ def randomEntity():
 	return e
 
 
-def main():
-	pygame.init()
-	drects, last_drects = [], []
-	screen = pygame.display.set_mode((640, 480))
-	pygame.display.set_caption("Theta 12")
-	background = pygame.Surface(screen.get_size())
-	background = background.convert()
-	background.fill((250, 250, 250))
-	
-	screen.blit(background, (0, 0))
-	pygame.display.flip()
-
-	font = pygame.font.Font(None, 24) 
+class Engine(object):
+	def init(self):
+		pygame.init()
+		self.drects, self.last_drects = [], []
+		self.screen = pygame.display.set_mode((640, 480))
+		pygame.display.set_caption("Theta 12")
+		self.background = pygame.Surface(self.screen.get_size())
+		self.background = self.background.convert()
+		self.background.fill((250, 250, 250))
 		
-	artist = graphwrap.Artist(screen, screen.get_size(), drects)
+		self.screen.blit(self.background, (0, 0))
+		pygame.display.flip()
 	
-
-	clock = pygame.time.Clock()
+		self.font = pygame.font.Font(None, 24) 
+			
+		self.artist = graphwrap.Artist(self.screen, self.screen.get_size(), self.drects)
+		
 	
-	t12.current_level = level.tlevel
-	t12.current_level.load()
-	croom = t12.current_level.croom
-
-	t12.player = entities.Actor((420.0, 100.0, 30.0, 20.0), t12.sprites["Velociraptor"])
-	t12.player.name = "player"
-	t12.player.jumpheight = 72 # wikianswers says this number should be 72, but that is boring.
-	t12.player.speed = 396 # 396 in/2s according to wikianswers
-	t12.player.setHealth(30)
-	t12.player.hands = (55, 20)
-	t12.player.showhealthbar = False
+		self.clock = pygame.time.Clock()
+		
+		t12.current_level = level.tlevel
+		t12.current_level.load()
+		self.croom = t12.current_level.croom
 	
-	t12.player.adjustGeomToImage()
-	t12.player.stretchArt = False
-	t12.player.geom.width = 20 # testing things
-
-	croom.add(t12.player)
-	t12.player.geom.center = croom.playerstart
-
-	inventory.addWeapon(entities.Pistol(False))
-	inventory.addWeapon(entities.FireballGun(False))
-	inventory.addWeapon(entities.Shotgun(False))
-	inventory.changeWeapon(0)
+		t12.player = entities.Actor((420.0, 100.0, 30.0, 20.0), t12.sprites["Velociraptor"])
+		t12.player.name = "player"
+		t12.player.jumpheight = 72 # wikianswers says this number should be 72, but that is boring.
+		t12.player.speed = 396 # 396 in/2s according to wikianswers
+		t12.player.setHealth(30)
+		t12.player.hands = (55, 20)
+		t12.player.showhealthbar = False
+		
+		t12.player.adjustGeomToImage()
+		t12.player.stretchArt = False
+		t12.player.geom.width = 20 # testing things
 	
+		self.croom.add(t12.player)
+		t12.player.geom.center = self.croom.playerstart
+	
+		inventory.addWeapon(entities.Pistol(False))
+		inventory.addWeapon(entities.FireballGun(False))
+		inventory.addWeapon(entities.Shotgun(False))
+		inventory.changeWeapon(0)
+		
+	
+		self.firstframe = True
+		self.last_time = 0
+		self.seconds = 0
+		self.ctime = 0
+	
+		self.lastWeaponTextLength = 0
+	
+		self.activating = False # is the player pressing the activate button?
 
-	firstframe = True
-	last_time = 0
-	seconds = 0
-	ctime = 0
+	def update(self):
+		self.ctime = time.time()
+		self.seconds = self.ctime - self.last_time
+		t12.seconds_passed = self.seconds
+		t12.game_time += self.seconds
+		self.last_time = time.time()
+		if self.firstframe:
+			self.seconds = 0
+			self.firstframe = False
 
-	lastWeaponTextLength = 0
-
-	activating = False # is the player pressing the activate button?
-
-	while 1:
-		ctime = time.time()
-		seconds = ctime - last_time
-		t12.seconds_passed = seconds
-		t12.game_time += seconds
-		last_time = time.time()
-		if firstframe:
-			seconds = 0
-			firstframe = False
-
-		screen.blit(background, (0, 0))
+		self.screen.blit(self.background, (0, 0))
 
 
 		# process events
@@ -112,7 +113,7 @@ def main():
 				elif event.key == pygame.K_s:
 					t12.player.attack(t12.dir_down)
 				elif event.key == pygame.K_SPACE:
-					activating = True
+					self.activating = True
 				elif event.key == pygame.K_UP:
 					if t12.player.grounded:
 						t12.player.jump()
@@ -127,7 +128,7 @@ def main():
 					t12.flags["input left"] = False
 					#t12.player.anim.runSequence("right")
 				elif event.key == pygame.K_p:
-					t12.camy = t12.player.geom.centery - screen.get_height()/2
+					t12.camy = t12.player.geom.centery - self.screen.get_height()/2
 				elif event.key == pygame.K_c:
 					t12.player.geom.center = (200, 100)
 					t12.player.velx, t12.player.vely = 0, 0
@@ -150,10 +151,10 @@ def main():
 					t12.flags["input right"] = False
 					#t12.player.velx = 0
 				elif event.key == pygame.K_SPACE or event.key == pygame.K_e:
-					activating = False
+					self.activating = False
 
 		# apply air friction
-		t12.player.decelerate(5000*seconds, 0) # this is really high because low decelerations make it hard.
+		t12.player.decelerate(5000*self.seconds, 0) # this is really high because low decelerations make it hard.
 
 		# make input mac-friendly
 		if not pygame.key.get_pressed()[pygame.K_LEFT]:
@@ -169,54 +170,54 @@ def main():
 
 
 		# update movement/spawn things
-		#print "Updating croom.all"
-		for e in croom.all:
+		#print "Updating self.croom.all"
+		for e in self.croom.all:
 			if e.flagForRemoval:
 				if e.name != None:
 					t12.spam("Removing " + '"' + e.name + '"')
-				croom.remove(e)
+				self.croom.remove(e)
 				continue
-			e.update(seconds)
+			e.update(self.seconds)
 			if len(e.spawn) > 0:
 				for s in e.spawn:
-					croom.add(s)
+					self.croom.add(s)
 				e.spawn = []
 
 				
 		# detect collisions
 		#print "Detecting Collisions"
-		for a in croom.geometry:
-			for b in croom.touch_geom:
+		for a in self.croom.geometry:
+			for b in self.croom.touch_geom:
 				if a is b: continue # this really should never happen
 				a.checkCollision(b)
 
-		for a in croom.touch_player:
+		for a in self.croom.touch_player:
 			if a is t12.player: continue # this really should never happen
 			a.checkCollision(t12.player)
 
-		for a in croom.touch_enemies:
-			for b in croom.actors:
+		for a in self.croom.touch_enemies:
+			for b in self.croom.actors:
 				if a is b or b is t12.player: continue
 				a.checkCollision(b)
 
-		if activating:
-			for a in croom.activators:
+		if self.activating:
+			for a in self.croom.activators:
 				if a is t12.player: continue # this really should never happen
 				if a.intersects(t12.player):
 					a.activate()
 
 		#print "Finalizing Collisions"
-		for e in croom.all:
+		for e in self.croom.all:
 			e.finalizeCollision()
 
 		#print "Appyling Gravity"
-		for a in croom.actors:
+		for a in self.croom.actors:
 			if not a.grounded:
 				a.acy = t12.gravity
 			else:
 				a.acy = 0
 
-		wid, hig = screen.get_size()
+		wid, hig = self.screen.get_size()
 		wd = t12.player.geom.centerx - wid/2
 		hd = t12.camy
 		if t12.player.geom.top - t12.camy < 50:
@@ -235,60 +236,64 @@ def main():
 		# It is entirely possible to replace this simple /5 with a slightly more sophisticated approach that would always
 		# reach its destination in a predermined time interval. Feel free to implement this if you dislike my magic numbers.
 		# Personally, I think it's just fine how it is now.
-		xinc = abs(artist.offsetx+wd)/5
-		yinc = abs(artist.offsety+hd)/5
+		xinc = abs(self.artist.offsetx+wd)/5
+		yinc = abs(self.artist.offsety+hd)/5
 
-		if artist.offsetx < -wd:
-			artist.offsetx += xinc
-		elif artist.offsetx > -wd:
-			artist.offsetx -= xinc
+		if self.artist.offsetx < -wd:
+			self.artist.offsetx += xinc
+		elif self.artist.offsetx > -wd:
+			self.artist.offsetx -= xinc
 
-		if artist.offsety < -hd:
-			artist.offsety += yinc
-		elif artist.offsety > -hd:
-			artist.offsety -= yinc
+		if self.artist.offsety < -hd:
+			self.artist.offsety += yinc
+		elif self.artist.offsety > -hd:
+			self.artist.offsety -= yinc
 
 		# draw everything
 		#print "Drawing Everything"
-		for e in croom.art_back:
-			e.updateArt(seconds)
-			e.draw(artist)
-		for e in croom.art_mid:
-			e.updateArt(seconds)
-			e.draw(artist)
-		for e in croom.art_front:
-			e.updateArt(seconds)
-			e.draw(artist)
-		for e in croom.art_over:
-			e.updateArt(seconds)
-			e.draw(artist)
+		for e in self.croom.art_back:
+			e.updateArt(self.seconds)
+			e.draw(self.artist)
+		for e in self.croom.art_mid:
+			e.updateArt(self.seconds)
+			e.draw(self.artist)
+		for e in self.croom.art_front:
+			e.updateArt(self.seconds)
+			e.draw(self.artist)
+		for e in self.croom.art_over:
+			e.updateArt(self.seconds)
+			e.draw(self.artist)
 
 		#print "Updating Dirty Rects"
-		pygame.display.update(last_drects)
-		pygame.display.update(drects)
+		pygame.display.update(self.last_drects)
+		pygame.display.update(self.drects)
 		#pygame.display.flip() # debug ONLY!
-		move(drects, last_drects, True)
+		move(self.drects, self.last_drects, True)
 
 		#print "Drawing Status Text"
-		weapon_text = font.render("Weapon: " + t12.player.weapon.name, 1, (0, 0, 0))
-		health_text = font.render("Health: ", 1, (0, 0, 0))
-		screen.blit(weapon_text, (10, screen.get_height()-30))
-		pygame.display.update((10, screen.get_height()-30, max(lastWeaponTextLength, weapon_text.get_width()), weapon_text.get_height()))
-		screen.fill((0, 0, 0), (10, screen.get_height()-30, max(lastWeaponTextLength, weapon_text.get_width()), weapon_text.get_height()))
-		lastWeaponTextLength = weapon_text.get_width()
-		healthx, healthy = 10, screen.get_height()-30 - weapon_text.get_height() - 5
-		screen.blit(health_text, (healthx, healthy))
+		weapon_text = self.font.render("Weapon: " + t12.player.weapon.name, 1, (0, 0, 0))
+		health_text = self.font.render("Health: ", 1, (0, 0, 0))
+		self.screen.blit(weapon_text, (10, self.screen.get_height()-30))
+		pygame.display.update((10, self.screen.get_height()-30, max(self.lastWeaponTextLength, weapon_text.get_width()), weapon_text.get_height()))
+		self.screen.fill((0, 0, 0), (10, self.screen.get_height()-30, max(self.lastWeaponTextLength, weapon_text.get_width()), weapon_text.get_height()))
+		self.lastWeaponTextLength = weapon_text.get_width()
+		healthx, healthy = 10, self.screen.get_height()-30 - weapon_text.get_height() - 5
+		self.screen.blit(health_text, (healthx, healthy))
 
 		healthbar = (healthx+health_text.get_width(), healthy, min(100, max(0, int(100. * t12.player.health / t12.player.maxhealth))), health_text.get_height())
 		if healthbar[2] > 0: # don't try to draw the bar if it is less than 1, or things may break.
-			screen.fill((255, 0, 0), healthbar)
-		pygame.draw.rect(screen, (0, 0, 0), (healthx+health_text.get_width(), healthy, 100, health_text.get_height()), 1)
+			self.screen.fill((255, 0, 0), healthbar)
+		pygame.draw.rect(self.screen, (0, 0, 0), (healthx+health_text.get_width(), healthy, 100, health_text.get_height()), 1)
 
-		pygame.display.update(healthx, healthy, max(lastWeaponTextLength, health_text.get_width()+100), health_text.get_height())
+		pygame.display.update(healthx, healthy, max(self.lastWeaponTextLength, health_text.get_width()+100), health_text.get_height())
 
-		#print "Ticking"
-		clock.tick(60)
+	def main(self):
+		self.init()
+		while 1:
+			self.update()
+			#print "Ticking"
+			self.clock.tick(60)
 
 
 if __name__ == "__main__":
-	main()
+	Engine().main()

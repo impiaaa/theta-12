@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>theta-12</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.python.pydev.PyDevBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.python.pydev.pythonNature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>editor</name>
+			<type>2</type>
+			<locationURI>REPO_LOC/editor</locationURI>
+		</link>
+		<link>
+			<name>engine</name>
+			<type>2</type>
+			<locationURI>REPO_LOC/engine</locationURI>
+		</link>
+		<link>
+			<name>global.xml</name>
+			<type>1</type>
+			<locationURI>REPO_LOC/global.xml</locationURI>
+		</link>
+	</linkedResources>
+	<variableList>
+		<variable>
+			<name>REPO_LOC</name>
+			<value>$%7BPARENT-1-WORKSPACE_LOC%7D</value>
+		</variable>
+	</variableList>
+</projectDescription>
