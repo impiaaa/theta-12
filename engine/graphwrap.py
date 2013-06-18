@@ -7,6 +7,9 @@ class ImageLoader:
 	def __init__(self):
 		""" There is a global ImageLoader. Do not make a new one using this constructor, please. """
 		self.loaded_images = {}
+		self.broken_image = pygame.Surface((32, 32))
+		self.broken_image.fill((255, 0, 255), ((0, 0), (16, 16)))
+		self.broken_image.fill((255, 0, 255), ((16, 16), (32, 32)))
 
 	def getImage(self, path, reload=False):
 		""" File format should be in the form globals/sprites/foo.png or whatever.
@@ -20,7 +23,7 @@ class ImageLoader:
 				path = self._findUncase(path)
 				if path == None:
 					print "No such image (" + opath + ")"
-					return None
+					return self.broken_image
 
 			image = pygame.image.load(path).convert_alpha()
 			self.loaded_images[path.lower()] = image
