@@ -1,0 +1,1 @@
+A platformer game developed by the CODE club of Claremont High School. (TODO: ?)
